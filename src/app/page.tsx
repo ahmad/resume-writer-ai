@@ -34,7 +34,28 @@ function ResumePreview({ data, isLoading }: { data: ResumeData; isLoading: boole
     }
   };
 
-  return (
+  const getRecommendations = async () => {
+   try {
+    const response: Response = await fetch('/api/recommendations', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get recommendations');
+    }
+
+    const data = await response.json();
+    console.log(data);
+   } catch (error) {
+    console.error('Error getting recommendations:', error);
+    alert('Failed to get recommendations. Please try again.');
+   }
+  };
+
+      return (
     <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-4xl text-gray-900 text-sm relative">
       {/* Loading Overlay */}
       {isLoading && (
@@ -48,13 +69,22 @@ function ResumePreview({ data, isLoading }: { data: ResumeData; isLoading: boole
       
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">{data.name}</h2>
-        <button
-          onClick={handleDownload}
-          disabled={isLoading}
-          className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Download PDF
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={getRecommendations}
+            disabled={isLoading}
+            className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Get Recommendations
+          </button>
+          <button
+            onClick={handleDownload}
+            disabled={isLoading}
+            className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Download PDF
+          </button>
+        </div>
       </div>
       <div className="text-blue-700 font-semibold mb-2">{data.title}</div>
       <div className="mb-2 text-xs text-gray-500">{data.location} | {data.email} | {data.phone}</div>
@@ -65,15 +95,24 @@ function ResumePreview({ data, isLoading }: { data: ResumeData; isLoading: boole
       <div className="mb-4 text-gray-700">{data.summary}</div>
       <div className="mb-4">
         <div className="font-semibold mb-1">Skills</div>
-        <div className="flex flex-wrap gap-1">
-          {data.skills.map((skill) => (
-            <span key={skill} className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">{skill}</span>
-          ))}
+        <div className="">
+          {Object.keys(data.skills).map((item) => {
+            return (
+              <div key={item} className="mb-1 flex gap-1">
+                <div className="w-1/4 font-semibold mb-1">{item}</div>
+                <div className="w-3/4 flex gap-1">
+                  {data.skills[item].map((skill) => (
+                    <span key={skill} className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">{skill}</span>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
       <div className="mb-4">
         <div className="font-semibold mb-1">Projects</div>
-        <ul className="list-disc list-inside">
+        <ul className="list-disc ml-6">
           {data.projects.map((proj) => (
             <li key={proj.title} className="mb-1">
               <span className="font-semibold">{proj.title}:</span> {proj.description} {" "}
@@ -88,7 +127,7 @@ function ResumePreview({ data, isLoading }: { data: ResumeData; isLoading: boole
           <div key={exp.title + exp.company} className="mb-2">
             <div className="font-semibold">{exp.title}, {exp.company}</div>
             <div className="text-xs text-gray-500 mb-1">{exp.period} | {exp.location}</div>
-            <ul className="list-disc list-inside ml-4">
+            <ul className="list-disc ml-6">
               {exp.bullets.map((b, i) => (
                 <li key={i}>{b}</li>
               ))}
@@ -125,7 +164,7 @@ function ChatPopup({ messages, isOpen, onClose }: {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl h-[80vh] flex flex-col">
         <div className="flex justify-between items-center p-4 border-b">
-          <h3 className="text-lg font-semibold">Chat History</h3>
+          <h3 className="text-lg text-black font-semibold">Chat History</h3>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 text-xl"
@@ -195,6 +234,7 @@ export default function Home() {
       setMessages((msgs) => [
         ...msgs,
         { sender: "system", text: "I've analyzed your job description and updated your resume to better match the requirements." },
+        { sender: "system", text: data.content.changeSummary },
       ]);
       
       setResumeData(data.content as ResumeData);

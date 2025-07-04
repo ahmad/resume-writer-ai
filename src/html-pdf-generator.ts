@@ -149,7 +149,14 @@ export class HTMLPDFGenerator {
           <div class="section">
             <div class="section-header">SKILLS</div>
             <div class="skills">
-              ${this.data.skills.map(skill => `<span class="skill">${skill}</span>`).join('')}
+              ${Object.keys(this.data.skills).map(key => `
+                <div class="skill-category">
+                  <div class="skill-category-header">${key}</div>
+                  <div class="skill-list">
+                    ${this.data.skills[key].map(skill => `<span class="skill">${skill}</span>`).join('')}
+                  </div>
+                </div>
+              `).join('')}
             </div>
           </div>
 

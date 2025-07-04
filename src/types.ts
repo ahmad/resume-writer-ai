@@ -1,4 +1,5 @@
 export interface ResumeData {
+  changeSummary: string;
   name: string;
   title: string;
   location: string;
@@ -7,7 +8,9 @@ export interface ResumeData {
   linkedin: string;
   website: string;
   summary: string;
-  skills: string[];
+  skills: {
+    [key: string]: string[];
+  };
   experience: Experience[];
   education: Education[];
   projects: Project[];

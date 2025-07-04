@@ -2,6 +2,7 @@ import { ResumeData } from './types';
 
 // Default resume configuration matching the sample PDF
 export const defaultResumeData: ResumeData = {
+  changeSummary: "Provide a summary of the changes made to the resume.",
   name: 'Ahmad Amin',
   title: 'Senior Full Stack Engineer',
   location: 'New York, NY',
@@ -10,26 +11,41 @@ export const defaultResumeData: ResumeData = {
   linkedin: 'in/ahmadamin',
   website: 'ahmadamin.com',
   summary: 'Accomplished Full Stack Engineer with 14 years of experience, including a decade in a leadership role as Partner/CTO at Global Data Capture. A hands-on technical leader adept at orchestrating technology strategy, scaling secure architectures, and managing development teams. Expertise in modern full-stack technologies including TypeScript, Next.js, and AWS.',
-  skills: [
-    "TypeScript/JavaScript",
-    "Next.js/React",
-    "Tailwind",
-    "HTML/CSS",
-    "Node.js",
-    "Express",
-    "PHP/Laravel/Zend",
-    "MySQL",
-    "PostgreSQL",
-    "Firebase",
-    "MongoDB",
-    "React Native/Expo",
-    "Swift/SwiftUI",
-    "Unity/C#",
-    "AWS",
-    "Docker",
-    "Linux",
-    "Git"
-  ],
+  skills: {
+    "Languages": [
+      "TypeScript",
+      "JavaScript",
+      "PHP",
+      "Node.js",
+      "Swift",
+      "C#",
+      "SQL",
+      "HTML",
+      "CSS"
+    ],
+    "Frameworks": [
+      "React",
+      "Next.js",
+      "React Native/Expo",
+      "Unity/C#",
+      "Express",
+      "Laravel",
+      "Zend Framework",
+    ],
+    "Databases": [
+      "MySQL",
+      "PostgreSQL",
+      "Firebase",
+      "MongoDB",
+      "Supabase",
+    ],
+    "DevOps &Tools": [
+      "Git",
+      "Docker",
+      "Linux",
+      "AWS"
+    ]
+  },
   projects: [
     {
       title: 'MyTennis.Team',
