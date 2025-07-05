@@ -9,8 +9,7 @@ import {
   query,
   where,
   orderBy,
-  Timestamp,
-  DocumentData
+  Timestamp
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { ResumeData } from '../types';
@@ -62,7 +61,8 @@ export const getResumeData = async (resumeId: string): Promise<ResumeData | null
   if (resumeSnap.exists()) {
     const data = resumeSnap.data();
     // Remove Firestore metadata before returning
-    const { userId, createdAt, updatedAt, ...resumeData } = data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { userId: _userId, createdAt: _createdAt, updatedAt: _updatedAt, ...resumeData } = data;
     return resumeData as ResumeData;
   }
   return null;
@@ -82,7 +82,8 @@ export const getUserResumes = async (userId: string): Promise<Array<ResumeData &
   
   querySnapshot.forEach((doc) => {
     const data = doc.data();
-    const { userId, createdAt, ...resumeData } = data;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { userId: _userId, createdAt: _createdAt, ...resumeData } = data;
     resumes.push({ 
       id: doc.id, 
       ...resumeData 
@@ -117,7 +118,7 @@ export const duplicateResume = async (userId: string, resumeId: string): Promise
 };
 
 // Save user preferences
-export const saveUserPreferences = async (userId: string, preferences: any): Promise<void> => {
+export const saveUserPreferences = async (userId: string, preferences: unknown): Promise<void> => {
   const userRef = doc(db, 'users', userId);
   await setDoc(userRef, {
     preferences,
@@ -126,7 +127,7 @@ export const saveUserPreferences = async (userId: string, preferences: any): Pro
 };
 
 // Get user preferences
-export const getUserPreferences = async (userId: string): Promise<any> => {
+export const getUserPreferences = async (userId: string): Promise<unknown> => {
   const userRef = doc(db, 'users', userId);
   const userSnap = await getDoc(userRef);
   

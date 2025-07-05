@@ -22,8 +22,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignu
     try {
       await signIn(email, password);
       onSuccess?.();
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to sign in';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -81,7 +82,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess, onSwitchToSignu
               onClick={onSwitchToSignup}
               className="text-blue-600 hover:text-blue-500 text-sm"
             >
-              Don't have an account? Sign up
+              Don&apos;t have an account? Sign up
             </button>
           </div>
         )}

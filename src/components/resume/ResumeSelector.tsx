@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ResumeData } from '../../types';
 import { getUserResumes } from '../../lib/firestore';
@@ -16,13 +16,7 @@ export default function ResumeSelector({ onResumeSelect, onCancel }: ResumeSelec
   const [isLoading, setIsLoading] = useState(true);
   const [selectedResumeId, setSelectedResumeId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      loadUserResumes();
-    }
-  }, [user]);
-
-  const loadUserResumes = async () => {
+  const loadUserResumes = useCallback(async () => {
     if (!user) return;
     
     setIsLoading(true);
@@ -34,24 +28,31 @@ export default function ResumeSelector({ onResumeSelect, onCancel }: ResumeSelec
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      loadUserResumes();
+    }
+  }, [user, loadUserResumes]);
 
   const handleResumeSelect = () => {
     if (!selectedResumeId) return;
     
-          const selectedResume = userResumes.find(resume => resume.id === selectedResumeId);
-      if (selectedResume) {
-        // Remove the id and updatedAt from the resume data before passing it
-        const { id: _id, updatedAt: _updatedAt, ...resumeData } = selectedResume;
-        onResumeSelect(resumeData);
-      }
+    const selectedResume = userResumes.find(resume => resume.id === selectedResumeId);
+    if (selectedResume) {
+      // Remove the id and updatedAt from the resume data before passing it
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { id: _id, updatedAt: _updatedAt, ...resumeData } = selectedResume;
+      onResumeSelect(resumeData);
+    }
   };
 
   const formatDate = (timestamp: unknown) => {
     if (!timestamp) return 'Unknown';
     
     try {
-      const date = (timestamp as any).toDate ? (timestamp as any).toDate() : new Date(timestamp as string | number | Date);
+      const date = (timestamp as { toDate?: () => Date }).toDate ? (timestamp as { toDate: () => Date }).toDate() : new Date(timestamp as string | number | Date);
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -59,7 +60,7 @@ export default function ResumeSelector({ onResumeSelect, onCancel }: ResumeSelec
         hour: '2-digit',
         minute: '2-digit'
       });
-    } catch (error) {
+    } catch {
       return 'Unknown';
     }
   };
@@ -105,9 +106,9 @@ export default function ResumeSelector({ onResumeSelect, onCancel }: ResumeSelec
                 </svg>
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">No resumes found</h3>
-                              <p className="text-gray-600 mb-6">
-                  You don&apos;t have any saved resumes yet. Please create a resume first using the Advanced Builder.
-                </p>
+              <p className="text-gray-600 mb-6">
+                You don&apos;t have any saved resumes yet. Please create a resume first using the Advanced Builder.
+              </p>
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={onCancel}

@@ -4,7 +4,7 @@ import React from 'react';
 import { ResumeData } from '../../types';
 
 interface ResumeListProps {
-  resumes: Array<ResumeData & { id: string; updatedAt: any }>;
+  resumes: Array<ResumeData & { id: string; updatedAt: unknown }>;
   onCreateNew: () => void;
   onEditResume: (resumeId: string) => void;
   onDeleteResume: (resumeId: string) => void;
@@ -18,11 +18,11 @@ export default function ResumeList({
   onDeleteResume,
   onDuplicateResume
 }: ResumeListProps) {
-  const formatDate = (timestamp: any) => {
+  const formatDate = (timestamp: unknown) => {
     if (!timestamp) return 'Unknown';
     
     try {
-      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      const date = (timestamp as { toDate?: () => Date }).toDate ? (timestamp as { toDate: () => Date }).toDate() : new Date(timestamp as string | number | Date);
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -30,7 +30,7 @@ export default function ResumeList({
         hour: '2-digit',
         minute: '2-digit'
       });
-    } catch (error) {
+    } catch {
       return 'Unknown';
     }
   };

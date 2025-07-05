@@ -42,8 +42,9 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLog
     try {
       await signUp(email, password, name.trim());
       onSuccess?.();
-    } catch (err: any) {
-      setError(err.message || 'Failed to create account');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create account';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

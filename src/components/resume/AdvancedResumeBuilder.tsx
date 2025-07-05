@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { ResumeData, Experience, Education, Project } from '../../types';
+import { ResumeData } from '../../types';
 import { saveResumeData, getResumeData, getUserResumes, deleteResume, duplicateResume } from '../../lib/firestore';
 import ResumeForm from './ResumeForm';
 import ResumePreview from './ResumePreview';
@@ -31,19 +31,12 @@ export default function AdvancedResumeBuilder() {
 
   const [resumeData, setResumeData] = useState<ResumeData>(getDefaultResumeData());
   const [currentResumeId, setCurrentResumeId] = useState<string | null>(null);
-  const [userResumes, setUserResumes] = useState<Array<ResumeData & { id: string; updatedAt: any }>>([]);
+  const [userResumes, setUserResumes] = useState<Array<ResumeData & { id: string; updatedAt: unknown }>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'form' | 'preview' | 'list'>('list');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Load user's resumes on component mount
-  useEffect(() => {
-    if (user) {
-      loadUserResumes();
-    }
-  }, [user]);
-
-  const loadUserResumes = async () => {
+  const loadUserResumes = useCallback(async () => {
     if (!user) return;
     
     setIsLoading(true);
@@ -55,7 +48,14 @@ export default function AdvancedResumeBuilder() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
+
+  // Load user's resumes on component mount
+  useEffect(() => {
+    if (user) {
+      loadUserResumes();
+    }
+  }, [user, loadUserResumes]);
 
   const handleCreateNew = () => {
     setResumeData(getDefaultResumeData());

@@ -11,7 +11,7 @@ interface ResumeFormProps {
 export default function ResumeForm({ data, onChange }: ResumeFormProps) {
   const [activeSection, setActiveSection] = useState<string>('basic');
 
-  const updateField = (field: keyof ResumeData, value: any) => {
+  const updateField = (field: keyof ResumeData, value: string) => {
     onChange({ [field]: value });
   };
 
