@@ -1,0 +1,217 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
+import { ResumeData, Experience, Education, Project } from '../../types';
+import { saveResumeData, getResumeData, getUserResumes, deleteResume } from '../../lib/firestore';
+import ResumeForm from './ResumeForm';
+import ResumePreview from './ResumePreview';
+import ResumeList from './ResumeList';
+
+export default function AdvancedResumeBuilder() {
+  const { user } = useAuth();
+  const [resumeData, setResumeData] = useState<ResumeData>({} as ResumeData);
+  const [currentResumeId, setCurrentResumeId] = useState<string | null>(null);
+  const [userResumes, setUserResumes] = useState<Array<ResumeData & { id: string; updatedAt: any }>>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [viewMode, setViewMode] = useState<'form' | 'preview' | 'list'>('list');
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Load user's resumes on component mount
+  useEffect(() => {
+    if (user) {
+      loadUserResumes();
+    }
+  }, [user]);
+
+  const loadUserResumes = async () => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    try {
+      const resumes = await getUserResumes(user.uid);
+      setUserResumes(resumes);
+    } catch (error) {
+      console.error('Error loading resumes:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCreateNew = () => {
+    setResumeData({} as ResumeData);
+    setCurrentResumeId(null);
+    setViewMode('form');
+  };
+
+  const handleEditResume = async (resumeId: string) => {
+    setIsLoading(true);
+    try {
+      const resume = await getResumeData(resumeId);
+      if (resume) {
+        setResumeData(resume);
+        setCurrentResumeId(resumeId);
+        setViewMode('form');
+      }
+    } catch (error) {
+      console.error('Error loading resume:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSaveResume = async () => {
+    if (!user) return;
+
+    setIsSaving(true);
+    try {
+      const resumeId = await saveResumeData(user.uid, resumeData, currentResumeId || undefined);
+      setCurrentResumeId(resumeId);
+      await loadUserResumes(); // Refresh the list
+      alert('Resume saved successfully!');
+    } catch (error) {
+      console.error('Error saving resume:', error);
+      alert('Error saving resume. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteResume = async (resumeId: string) => {
+    if (!confirm('Are you sure you want to delete this resume?')) return;
+
+    setIsLoading(true);
+    try {
+      await deleteResume(resumeId);
+      await loadUserResumes(); // Refresh the list
+      if (currentResumeId === resumeId) {
+        setCurrentResumeId(null);
+        setResumeData({} as ResumeData);
+      }
+      alert('Resume deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting resume:', error);
+      alert('Error deleting resume. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDataChange = (newData: Partial<ResumeData>) => {
+    setResumeData(prev => ({ ...prev, ...newData }));
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Please log in to access the resume builder</h2>
+          <p className="text-gray-600">You need to be authenticated to create and manage your resumes.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <h1 className="text-2xl font-bold text-gray-900">Advanced Resume Builder</h1>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-4 py-2 rounded-md text-sm font-medium ${
+                  viewMode === 'list' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                My Resumes
+              </button>
+              <button
+                onClick={() => setViewMode('form')}
+                className={`px-4 py-2 rounded-md text-sm font-medium ${
+                  viewMode === 'form' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                Editor
+              </button>
+              <button
+                onClick={() => setViewMode('preview')}
+                className={`px-4 py-2 rounded-md text-sm font-medium ${
+                  viewMode === 'preview' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                Preview
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        ) : (
+          <>
+            {viewMode === 'list' && (
+              <ResumeList
+                resumes={userResumes}
+                onCreateNew={handleCreateNew}
+                onEditResume={handleEditResume}
+                onDeleteResume={handleDeleteResume}
+              />
+            )}
+
+            {viewMode === 'form' && (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    {currentResumeId ? 'Edit Resume' : 'Create New Resume'}
+                  </h2>
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={handleSaveResume}
+                      disabled={isSaving}
+                      className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isSaving ? 'Saving...' : 'Save Resume'}
+                    </button>
+                  </div>
+                </div>
+                <ResumeForm
+                  data={resumeData}
+                  onChange={handleDataChange}
+                />
+              </div>
+            )}
+
+            {viewMode === 'preview' && (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-semibold text-gray-900">Resume Preview</h2>
+                  <button
+                    onClick={() => setViewMode('form')}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Back to Editor
+                  </button>
+                </div>
+                <ResumePreview data={resumeData} />
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+} 

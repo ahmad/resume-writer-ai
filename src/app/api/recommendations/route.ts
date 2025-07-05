@@ -2,7 +2,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { defaultResumeData } from '../../../resume-config'
 
 /**
  * Cleans AI response text by removing hidden characters, markdown formatting,
@@ -26,8 +25,20 @@ function cleanAIResponse(text: string): string {
         .replace(/[\x00-\x08\x0A\x0B\x0C\x0E-\x1F\x7F]/g, '');
 }
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
     try {
+        const { resumeData } = await request.json();
+
+        if (!resumeData) {
+            return NextResponse.json(
+                { 
+                    success: false, 
+                    error: 'Resume data is required' 
+                }, 
+                { status: 400 }
+            );
+        }
+
         const genai = new GoogleGenAI({
             apiKey: process.env.GOOGLE_API_KEY,
         });
@@ -42,7 +53,7 @@ export async function GET(request: NextRequest) {
             - recommendations: An array of recommendations for the resume.
 
             Here is my current resume:
-            ${JSON.stringify(defaultResumeData)}`,
+            ${JSON.stringify(resumeData)}`,
             config: {
                 responseMimeType: "application/json",
             }

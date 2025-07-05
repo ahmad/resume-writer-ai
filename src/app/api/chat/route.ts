@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from '@google/genai';
-import { defaultResumeData } from '../../../resume-config'
+
 
 /**
  * Cleans AI response text by removing hidden characters, markdown formatting,
@@ -26,12 +26,12 @@ function cleanAIResponse(text: string): string {
         .replace(/[\x00-\x08\x0A\x0B\x0C\x0E-\x1F\x7F]/g, '');
 }
 
-function generateResumePrompt(jobDescription: string) {
+function generateResumePrompt(jobDescription: string, resumeData: Record<string, unknown>) {
     return `
 Act as an expert resume writer and career coach. Your task is to take my current resume and the job description for a position I am targeting and create a new, updated version of my resume that is highly tailored to this specific role.
 
 1. My Current Resume:
-${JSON.stringify(defaultResumeData)}
+${JSON.stringify(resumeData)}
 
 2. The Job Description:
 ${jobDescription}
@@ -79,7 +79,7 @@ Finally, after providing the updated resume, please also provide a brief summary
     `;
 }
 
-function generateCoverLetterPrompt(jobDescription: string, resumeData: any) {
+function generateCoverLetterPrompt(jobDescription: string, resumeData: Record<string, unknown>) {
     return `
 Act as an expert cover letter writer. Your task is to create a compelling cover letter for the job application based on the job description and resume information provided.
 
@@ -122,7 +122,17 @@ Return the cover letter in the following JSON format:
 
 export async function POST(request: NextRequest) {
     try {
-        const { jobDescription } = await request.json();
+        const { jobDescription, resumeData } = await request.json();
+
+        if (!resumeData) {
+            return NextResponse.json(
+                { 
+                    success: false, 
+                    error: 'Resume data is required' 
+                }, 
+                { status: 400 }
+            );
+        }
 
         const genai = new GoogleGenAI({
             apiKey: process.env.GOOGLE_API_KEY,
@@ -131,7 +141,7 @@ export async function POST(request: NextRequest) {
         // Generate resume
         const resumeResponse = await genai.models.generateContent({
             model: "gemini-2.5-pro",
-            contents: generateResumePrompt(jobDescription),
+            contents: generateResumePrompt(jobDescription, resumeData),
             config: {
                 responseMimeType: "application/json",
             }

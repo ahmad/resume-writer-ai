@@ -1,236 +1,12 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { defaultResumeData } from "../resume-config";
 import type { ResumeData, CoverLetter } from "../types";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { UserProfile } from "@/components/auth/UserProfile";
-import { ResumeManager } from "@/components/resume/ResumeManager";
-
-function CoverLetterPreview({ data, resumeData, isLoading }: { data: CoverLetter; resumeData: ResumeData; isLoading: boolean }) {
-  const handleDownload = async () => {
-    try {
-      // Create a blob URL for the PDF
-      const response = await fetch('/api/generate-pdf', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ type: 'cover-letter', data }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to generate PDF');
-      }
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${data.recipientName.replace(/\s+/g, '_')}_cover_letter.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Failed to generate PDF. Please try again.');
-    }
-  };
-
-  return (
-    <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-4xl text-gray-900 text-sm relative">
-      {/* Loading Overlay */}
-      {isLoading && (
-        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-xl z-10">
-          <div className="flex flex-col items-center gap-3">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            <p className="text-gray-600 font-medium">Generating your cover letter...</p>
-          </div>
-        </div>
-      )}
-      
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Cover Letter</h2>
-        <button
-          onClick={handleDownload}
-          disabled={isLoading}
-          className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Download PDF
-        </button>
-      </div>
-
-              <div className="space-y-4">
-          <div className="text-right text-sm text-gray-600">
-            {data.date}
-          </div>
-          
-          <div className="space-y-2">
-            <div className="font-semibold">{data.recipientName}</div>
-            <div>{data.recipientTitle}</div>
-            <div>{data.companyName}</div>
-          </div>
-          
-          <div className="mt-6 leading-relaxed whitespace-pre-wrap">
-            {data.content}
-          </div>
-          
-          <div className="mt-8 text-sm text-gray-600">
-            <div>Sincerely,</div>
-            <div className="mt-2">
-              <div>{resumeData.name}</div>
-              <div>{resumeData.email}</div>
-              <div>{resumeData.phone}</div>
-            </div>
-          </div>
-        </div>
-    </div>
-  );
-}
-
-function ResumePreview({ data, isLoading }: { data: ResumeData; isLoading: boolean }) {
-  const handleDownload = async () => {
-    try {
-      // Create a blob URL for the PDF
-      const response = await fetch('/api/generate-pdf', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ type: 'resume', data }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to generate PDF');
-      }
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${data.name.replace(/\s+/g, '_')}_resume.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Failed to generate PDF. Please try again.');
-    }
-  };
-
-  const getRecommendations = async () => {
-   try {
-    const response: Response = await fetch('/api/recommendations', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get recommendations');
-    }
-
-    const data = await response.json();
-    console.log(data);
-   } catch (error) {
-    console.error('Error getting recommendations:', error);
-    alert('Failed to get recommendations. Please try again.');
-   }
-  };
-
-      return (
-    <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-4xl text-gray-900 text-sm relative">
-      {/* Loading Overlay */}
-      {isLoading && (
-        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-xl z-10">
-          <div className="flex flex-col items-center gap-3">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            <p className="text-gray-600 font-medium">Generating your resume...</p>
-          </div>
-        </div>
-      )}
-      
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">{data.name}</h2>
-        <div className="flex gap-2">
-          <button
-            onClick={getRecommendations}
-            disabled={isLoading}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Get Recommendations
-          </button>
-          <button
-            onClick={handleDownload}
-            disabled={isLoading}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Download PDF
-          </button>
-        </div>
-      </div>
-      <div className="text-blue-700 font-semibold mb-2">{data.title}</div>
-      <div className="mb-2 text-xs text-gray-500">{data.location} | {data.email} | {data.phone}</div>
-      <div className="mb-4 text-xs text-gray-500">
-        <a href={`https://linkedin.com/${data.linkedin}`} className="underline mr-2">LinkedIn</a>
-        <a href={`https://${data.website}`} className="underline">Website</a>
-      </div>
-      <div className="mb-4 text-gray-700">{data.summary}</div>
-      <div className="mb-4">
-        <div className="font-semibold mb-1">Skills</div>
-        <div className="">
-          {Object.keys(data.skills).map((item) => {
-            return (
-              <div key={item} className="mb-1 flex gap-1">
-                <div className="w-1/4 font-semibold mb-1">{item}</div>
-                <div className="w-3/4 flex gap-1">
-                  {data.skills[item].map((skill) => (
-                    <span key={skill} className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">{skill}</span>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-      <div className="mb-4">
-        <div className="font-semibold mb-1">Projects</div>
-        <ul className="list-disc ml-6">
-          {data.projects.map((proj) => (
-            <li key={proj.title} className="mb-1">
-              <span className="font-semibold">{proj.title}:</span> {proj.description} {" "}
-              <a href={proj.link.href} className="underline text-blue-700" target="_blank" rel="noopener noreferrer">{proj.link.label}</a>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="mb-4">
-        <div className="font-semibold mb-1">Experience</div>
-        {data.experience.map((exp) => (
-          <div key={exp.title + exp.company} className="mb-2">
-            <div className="font-semibold">{exp.title}, {exp.company}</div>
-            <div className="text-xs text-gray-500 mb-1">{exp.period} | {exp.location}</div>
-            <ul className="list-disc ml-6">
-              {exp.bullets.map((b, i) => (
-                <li key={i}>{b}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-      <div>
-        <div className="font-semibold mb-1">Education</div>
-        {data.education.map((edu) => (
-          <div key={edu.degree + edu.school} className="mb-1">
-            <span className="font-semibold">{edu.degree}</span>, {edu.school} <span className="text-xs text-gray-500">({edu.year})</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+import AdvancedResumeBuilder from "@/components/resume/AdvancedResumeBuilder";
+import ResumeSelector from "@/components/resume/ResumeSelector";
+import ResumePreview from "@/components/ResumePreview";
+import CoverLetterPreview from "@/components/CoverLetter";
 
 function TabbedPreview({ 
   resumeData, 
@@ -336,7 +112,7 @@ export default function Home() {
   ]);
   const [input, setInput] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [resumeData, setResumeData] = useState(defaultResumeData);
+  const [resumeData, setResumeData] = useState({} as ResumeData);
   const [coverLetterData, setCoverLetterData] = useState<CoverLetter>({
     date: new Date().toISOString().slice(0, 10),
     recipientName: "Hiring Manager",
@@ -346,9 +122,19 @@ export default function Home() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'resume' | 'cover-letter'>('resume');
+  const [builderMode, setBuilderMode] = useState<'ai' | 'advanced'>('ai');
+  const [selectedResume, setSelectedResume] = useState<ResumeData | null>(null);
+  const [showResumeSelector, setShowResumeSelector] = useState(false);
+
+  useEffect(() => {
+    // Show resume selector if in AI mode but no resume is selected
+    if (builderMode === 'ai' && !selectedResume) {
+      setShowResumeSelector(true);
+    }
+  }, [builderMode, selectedResume]);
 
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isLoading || !selectedResume) return;
     
     const userMessage = input.trim();
     setMessages((msgs) => [
@@ -363,7 +149,10 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ jobDescription: userMessage }),
+        body: JSON.stringify({ 
+          jobDescription: userMessage,
+          resumeData: selectedResume 
+        }),
       });
       
       if (!response.ok) {
@@ -405,6 +194,20 @@ export default function Home() {
     }
   };
 
+  const handleResumeSelect = (resumeData: ResumeData) => {
+    setSelectedResume(resumeData);
+    setResumeData(resumeData);
+    setShowResumeSelector(false);
+  };
+
+  const handleCancelResumeSelection = () => {
+    setShowResumeSelector(false);
+  };
+
+  const handleBuilderModeChange = (mode: 'ai' | 'advanced') => {
+    setBuilderMode(mode);
+  };
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
@@ -413,74 +216,135 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <h1 className="text-xl font-bold text-gray-900">Resume Writer AI</h1>
             <div className="flex items-center gap-4">
-              <ResumeManager 
-                currentResume={resumeData} 
-                onLoadResume={setResumeData} 
-              />
+              {/* Builder Mode Toggle */}
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => handleBuilderModeChange('ai')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    builderMode === 'ai'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  AI Builder
+                </button>
+                <button
+                  onClick={() => handleBuilderModeChange('advanced')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    builderMode === 'advanced'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Advanced Builder
+                </button>
+              </div>
               <UserProfile />
             </div>
           </div>
         </div>
 
-        {/* Chat Input */}
-        <div className="bg-white shadow-sm border-b sticky top-0 z-40">
-          <div className="max-w-6xl mx-auto px-4 py-4">
-            <div className="flex flex-col gap-4">
-              <textarea
-                className="w-full text-black px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
-                placeholder="Paste your job description here..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                rows={4}
-                style={{ minHeight: '120px', maxHeight: '200px' }}
+        {builderMode === 'ai' ? (
+          <>
+            {showResumeSelector ? (
+              <ResumeSelector 
+                onResumeSelect={handleResumeSelect}
+                onCancel={handleCancelResumeSelection}
               />
-              <div className="flex gap-2">
-                <button
-                  className="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                  onClick={handleSend}
-                  disabled={isLoading || !input.trim()}
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>Generating...</span>
-                    </>
-                  ) : (
-                    <span>Send</span>
-                  )}
-                </button>
-                <button
-                  onClick={() => setIsChatOpen(true)}
-                  className="bg-gray-100 text-gray-700 px-4 py-3 rounded-lg font-semibold hover:bg-gray-200 transition flex items-center gap-2"
-                >
-                  <span>Chat History</span>
-                  <span className="bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {messages.length - 1}
-                  </span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+            ) : (
+              <>
+                {/* Selected Resume Info */}
+                {selectedResume && (
+                  <div className="bg-blue-50 border-b border-blue-200">
+                    <div className="max-w-6xl mx-auto px-4 py-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          <span className="text-sm font-medium text-blue-900">
+                            Using resume: {selectedResume.name || 'Untitled Resume'}
+                          </span>
+                          {selectedResume.title && (
+                            <span className="text-sm text-blue-700">({selectedResume.title})</span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => setShowResumeSelector(true)}
+                          className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                          Change Resume
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
-        {/* Resume Preview */}
-        <div className="flex justify-center items-center min-h-[calc(100vh-180px)] px-4 py-8">
-          <TabbedPreview 
-            resumeData={resumeData} 
-            coverLetterData={coverLetterData} 
-            isLoading={isLoading} 
-            activeTab={activeTab} 
-            onTabChange={setActiveTab} 
+                {/* Chat Input */}
+                <div className="bg-white shadow-sm border-b sticky top-0 z-40">
+                  <div className="max-w-6xl mx-auto px-4 py-4">
+                    <div className="flex flex-col gap-4">
+                      <textarea
+                        className="w-full text-black px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                        placeholder="Paste your job description here..."
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        rows={4}
+                        style={{ minHeight: '120px', maxHeight: '200px' }}
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          className="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                          onClick={handleSend}
+                          disabled={isLoading || !input.trim() || !selectedResume}
+                        >
+                          {isLoading ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              <span>Generating...</span>
+                            </>
+                          ) : (
+                            <span>Send</span>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => setIsChatOpen(true)}
+                          className="bg-gray-100 text-gray-700 px-4 py-3 rounded-lg font-semibold hover:bg-gray-200 transition flex items-center gap-2"
+                        >
+                          <span>Chat History</span>
+                          <span className="bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                            {messages.length - 1}
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Resume Preview */}
+                <div className="flex justify-center items-center min-h-[calc(100vh-180px)] px-4 py-8">
+                  <TabbedPreview 
+                    resumeData={resumeData} 
+                    coverLetterData={coverLetterData} 
+                    isLoading={isLoading} 
+                    activeTab={activeTab} 
+                    onTabChange={setActiveTab} 
+                  />
+                </div>
+              </>
+            )}
+          </>
+        ) : (
+          <AdvancedResumeBuilder />
+        )}
+
+        {/* Chat Popup - Only show in AI mode */}
+        {builderMode === 'ai' && (
+          <ChatPopup 
+            messages={messages} 
+            isOpen={isChatOpen} 
+            onClose={() => setIsChatOpen(false)} 
           />
-        </div>
-
-        {/* Chat Popup */}
-        <ChatPopup 
-          messages={messages} 
-          isOpen={isChatOpen} 
-          onClose={() => setIsChatOpen(false)} 
-        />
+        )}
       </div>
     </ProtectedRoute>
   );
