@@ -23,12 +23,13 @@ export async function POST(request: NextRequest) {
       // This is a simplified approach - in a real app you might want to pass resume data separately
       const generator = new CoverLetterPDFGenerator(coverLetterData, {
         changeSummary: '',
-        name: coverLetterData.recipientName.split(' ')[0] + ' [Your Name]',
-        email: '[Your Email]',
-        phone: '[Your Phone]',
+        name: 'Ahmad Amin',
+        email: 'info@ahmadamin.com',
+        phone: '+1(347) 527-8553',
         title: '',
         location: '',
         linkedin: '',
+        github: '',
         website: '',
         summary: '',
         skills: {},

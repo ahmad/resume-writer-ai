@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@google/genai": "^1.8.0",
+    "firebase": "^11.10.0",
     "jspdf": "^3.0.1",
     "next": "15.3.4",
     "puppeteer": "^24.11.2",

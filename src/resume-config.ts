@@ -8,7 +8,8 @@ export const defaultResumeData: ResumeData = {
   location: 'New York, NY',
   email: 'info@ahmadamin.com',
   phone: '+1 (347) 527-8553',
-  linkedin: 'in/ahmadamin',
+  linkedin: 'linkedin.com/in/ahmadamin',
+  github: 'github.com/ahmad',
   website: 'ahmadamin.com',
   summary: 'Accomplished Full Stack Engineer with 14 years of experience, including a decade in a leadership role as Partner/CTO at Global Data Capture. A hands-on technical leader adept at orchestrating technology strategy, scaling secure architectures, and managing development teams. Expertise in modern full-stack technologies including TypeScript, Next.js, and AWS.',
   skills: {

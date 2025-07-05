@@ -43,8 +43,11 @@ First, thoroughly analyze the job description to identify the key keywords, requ
 Next, critically evaluate my current resume against this analysis.
 
 Then, rewrite my resume with the following goals:
+*Important: The languague used should read like a human wrote it AND not AI generated.*
+*Important: The resume should be in the same language as the job description.*
+*Important: Each jobs/experiences should have at least 3 bullet points.*
 
-Compelling Professional Summary: Create a powerful and concise professional summary (3-4 sentences) that immediately highlights my most relevant qualifications and experience for this specific job. It should be tailored to grab the hiring manager's attention.
+Compelling Professional Summary: Create a powerful and concise professional summary (3-4 sentences, 50 words max) that immediately highlights my most relevant qualifications and experience for this specific job. It should be tailored to grab the hiring manager's attention.
 
 Optimized Experience Section: For each relevant role in my experience section, rewrite the bullet points to:
 

@@ -15,191 +15,250 @@ export class HTMLPDFGenerator {
         <head>
           <meta charset="UTF-8">
           <title>${this.data.name} - Resume</title>
+          <script src="https://cdn.tailwindcss.com"></script>
           <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+            
             body {
-              font-family: Arial, sans-serif;
+              font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
               margin: 0;
-              padding: 40px;
-              font-size: 10px;
-              line-height: 1.4;
-              color: #333;
+              padding: 24px;
+              background-color: #f9fafb;
+              color: #111827;
+              font-size: 12px;
+              line-height: 1.5;
             }
-            .header {
-              text-align: center;
-              margin-bottom: 30px;
+            
+            .resume-container {
+              background-color: white;
+              border-radius: 0;
+              padding: 24px;
+              max-width: 800px;
+              margin: 0 auto;
+              box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
             }
+            
+            .header-section {
+              margin-bottom: 10px;
+            }
+            
             .name {
               font-size: 24px;
-              font-weight: bold;
-              margin-bottom: 5px;
+              font-weight: 700;
+              color: #111827;
+              margin-bottom: 0px;
             }
+            
             .title {
               font-size: 16px;
-              font-weight: bold;
-              color: #2563eb;
-              margin-bottom: 10px;
+              font-weight: 600;
+              color: #1d4ed8;
+              margin-bottom: 0px;
             }
-            .contact {
-              font-size: 10px;
-              color: #666;
-              margin-bottom: 20px;
-            }
-            .section {
-              margin-bottom: 20px;
-            }
-            .section-header {
-              font-size: 16px;
-              font-weight: bold;
-              color: #2563eb;
-              margin-bottom: 10px;
-              border-bottom: 1px solid #ddd;
-              padding-bottom: 5px;
-            }
-            .experience-item {
-              margin-bottom: 15px;
-            }
-            .job-title {
+            
+            .contact-info {
               font-size: 12px;
-              font-weight: bold;
-              display: inline-block;
-              width: 60%;
+              color: #6b7280;
+              margin-bottom: 0px;
             }
-            .period {
-              font-size: 10px;
-              text-align: right;
-              display: inline-block;
-              width: 40%;
+            
+            .links {
+              font-size: 12px;
+              color: #6b7280;
+              margin-bottom: 10px;
             }
-            .company {
-              font-size: 11px;
-              font-weight: bold;
-              color: #2563eb;
-              display: inline-block;
-              width: 60%;
+            
+            .links a {
+              color: #1d4ed8;
+              text-decoration: underline;
+              margin-right: 8px;
             }
-            .location {
-              font-size: 10px;
-              text-align: right;
-              display: inline-block;
-              width: 40%;
+            
+            .summary {
+              color: #374151;
+              margin-bottom: 16px;
+              font-size: 12px;
             }
-            .bullets {
-              margin-left: 20px;
-              margin-top: 5px;
+            
+            .section {
+              margin-bottom: 16px;
             }
-            .bullet {
-              margin-bottom: 3px;
+            
+            .section-title {
+              font-size: 14px;
+              font-weight: 600;
+              color: #111827;
+              margin-bottom: 4px;
             }
-            .skills {
+            
+            .skills-grid {
+              display: flex;
+              flex-direction: column;
+              gap: 4px;
+            }
+            
+            .skill-category {
+              display: flex;
+              gap: 4px;
+            }
+            
+            .skill-category-name {
+              width: 25%;
+              font-weight: 600;
+              font-size: 12px;
+            }
+            
+            .skill-tags {
+              width: 75%;
               display: flex;
               flex-wrap: wrap;
-              gap: 5px;
+              gap: 4px;
             }
-            .skill {
-              background: #e6f3ff;
-              color: #2563eb;
-              padding: 2px 6px;
-              border-radius: 3px;
-              font-size: 9px;
-            }
-            .project-item {
-              margin-bottom: 15px;
-            }
-            .project-title {
-              font-size: 12px;
-              font-weight: bold;
-              display: inline-block;
-              width: 70%;
-            }
-            .project-link {
-              font-size: 10px;
-              color: #2563eb;
-              text-align: right;
-              display: inline-block;
-              width: 30%;
-            }
-            .project-description {
-              margin-top: 5px;
-            }
-            .education-item {
-              margin-bottom: 10px;
-            }
-            .degree {
+            
+            .skill-tag {
+              background-color: #dbeafe;
+              color: #1e40af;
+              padding: 2px 8px;
+              border-radius: 4px;
               font-size: 11px;
-              font-weight: bold;
+              font-weight: 500;
             }
+            
+            .project-item {
+              margin-bottom: 4px;
+            }
+            
+            .project-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-start;
+              margin-bottom: 2px;
+            }
+            
+            .project-title {
+              font-weight: 600;
+              font-size: 12px;
+            }
+            
+            .project-link {
+              color: #1d4ed8;
+              text-decoration: underline;
+              font-size: 11px;
+            }
+            
+            .project-description {
+              font-size: 11px;
+              color: #374151;
+              margin-left: 16px;
+            }
+            
+            .experience-item {
+              margin-bottom: 8px;
+            }
+            
+            .job-header {
+              font-weight: 600;
+              font-size: 12px;
+              margin-bottom: 2px;
+            }
+            
+            .job-meta {
+              font-size: 12px;
+              color: #6b7280;
+              margin-bottom: 4px;
+            }
+            
+            .job-bullets {
+              margin-left: 16px;
+              list-style-type: disc;
+            }
+            
+            .job-bullet {
+              font-size: 12px;
+              color: #374151;
+              margin-bottom: 2px;
+            }
+            
+            .education-item {
+              margin-bottom: 4px;
+            }
+            
+            .degree {
+              font-weight: 600;
+              font-size: 12px;
+            }
+            
             .school-info {
-              font-size: 10px;
-              color: #666;
+              font-size: 11px;
+              color: #6b7280;
+            }
+            
+            @media print {
+              body {
+                background-color: white;
+                padding: 0;
+              }
+              
+              .resume-container {
+                box-shadow: none;
+                border-radius: 0;
+                padding: 20px;
+              }
             }
           </style>
         </head>
         <body>
-          <div class="header">
-            <div class="name">${this.data.name}</div>
-            <div class="title">${this.data.title}</div>
-            <div class="contact">${this.data.email} • ${this.data.phone} • ${this.data.website}</div>
-          </div>
-
-          <div class="section">
-            <div class="section-header">SUMMARY</div>
-            <div>${this.data.summary}</div>
-          </div>
-
-          <div class="section">
-            <div class="section-header">SKILLS</div>
-            <div class="skills">
-              ${Object.keys(this.data.skills).map(key => `
-                <div class="skill-category">
-                  <div class="skill-category-header">${key}</div>
-                  <div class="skill-list">
-                    ${this.data.skills[key].map(skill => `<span class="skill">${skill}</span>`).join('')}
+          <div class="resume-container">
+            <div class="header-section">
+              <div class="name">${this.data.name}</div>
+              <div class="title">${this.data.title}</div>
+              <div class="contact-info">${this.data.location} | ${this.data.email} | ${this.data.phone}</div>
+              <div class="links">
+                <a href="https://${this.data.linkedin}">${this.data.linkedin}</a>
+                <a href="https://${this.data.linkedin}">${this.data.github}</a>
+                <a href="https://${this.data.website}">${this.data.website}</a>
+              </div>
+            </div>
+            
+            <div class="summary">${this.data.summary}</div>
+            
+            <div class="section">
+              <div class="section-title">Skills</div>
+              <div class="skills-grid">
+                ${Object.keys(this.data.skills).map(key => `
+                  <div class="skill-category">
+                    <div class="skill-category-name">${key}</div>
+                    <div class="skill-tags">
+                      ${this.data.skills[key].map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                    </div>
                   </div>
+                `).join('')}
+              </div>
+            </div>
+
+            
+            <div class="section">
+              <div class="section-title">Experience</div>
+              ${this.data.experience.map(exp => `
+                <div class="experience-item">
+                  <div class="job-header">${exp.title}, ${exp.company}</div>
+                  <div class="job-meta">${exp.period} | ${exp.location}</div>
+                  <ul class="job-bullets">
+                    ${exp.bullets.map(bullet => `<li class="job-bullet">${bullet}</li>`).join('')}
+                  </ul>
                 </div>
               `).join('')}
             </div>
-          </div>
-
-          <div class="section">
-            <div class="section-header">EXPERIENCE</div>
-            ${this.data.experience.map(exp => `
-              <div class="experience-item">
-                <div>
-                  <span class="job-title">${exp.title}</span>
-                  <span class="period">${exp.period}</span>
+            
+            <div class="section">
+              <div class="section-title">Education</div>
+              ${this.data.education.map(edu => `
+                <div class="education-item">
+                  <div class="degree">${edu.degree}</div>
+                  <div class="school-info">${edu.school} (${edu.year})</div>
                 </div>
-                <div>
-                  <span class="company">${exp.company}</span>
-                  <span class="location">${exp.location}</span>
-                </div>
-                <div class="bullets">
-                  ${exp.bullets.map(bullet => `<div class="bullet">• ${bullet}</div>`).join('')}
-                </div>
-              </div>
-            `).join('')}
-          </div>
-
-          <div class="section">
-            <div class="section-header">PROJECTS</div>
-            ${this.data.projects.map(project => `
-              <div class="project-item">
-                <div>
-                  <span class="project-title">${project.title}</span>
-                  <span class="project-link">${project.link.label}</span>
-                </div>
-                <div class="project-description">${project.description}</div>
-              </div>
-            `).join('')}
-          </div>
-
-          <div class="section">
-            <div class="section-header">EDUCATION</div>
-            ${this.data.education.map(edu => `
-              <div class="education-item">
-                <div class="degree">${edu.degree}</div>
-                <div class="school-info">${edu.school} • ${edu.location} • ${edu.year}</div>
-              </div>
-            `).join('')}
+              `).join('')}
+            </div>
           </div>
         </body>
       </html>
@@ -252,61 +311,105 @@ export class CoverLetterPDFGenerator {
         <head>
           <meta charset="UTF-8">
           <title>Cover Letter</title>
+          <script src="https://cdn.tailwindcss.com"></script>
           <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+            
             body {
-              font-family: Arial, sans-serif;
+              font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
               margin: 0;
-              padding: 40px;
-              font-size: 12px;
-              line-height: 1.6;
-              color: #333;
-            }
-            .date {
-              text-align: right;
-              margin-bottom: 30px;
-              font-size: 12px;
-              color: #666;
-            }
-            .recipient {
-              margin-bottom: 30px;
-            }
-            .recipient-name {
-              font-weight: bold;
+              padding: 24px;
+              background-color: #f9fafb;
+              color: #111827;
               font-size: 14px;
-              margin-bottom: 5px;
+              line-height: 1.5;
             }
+            
+            .cover-letter-container {
+              background-color: white;
+              border-radius: 12px;
+              padding: 24px;
+              max-width: 800px;
+              margin: 0 auto;
+              box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            }
+            
+            .header-section {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 24px;
+              margin-top: 24px;
+            }
+            
+            .title {
+              font-size: 24px;
+              font-weight: 700;
+              color: #111827;
+            }
+            
+            .date {
+              text-align: left;
+            }
+            
+            .recipient-section {
+              margin-bottom: 24px;
+            }
+            
+            .recipient-name {
+              margin-bottom: 4px;
+            }
+            
             .recipient-title {
-              font-size: 12px;
-              margin-bottom: 5px;
+              margin-bottom: 4px;
             }
-            .company-name {
-              font-size: 12px;
-            }
+            
+            
             .content {
-              margin-bottom: 30px;
+              color: #374151;
+              line-height: 1.6;
               white-space: pre-wrap;
+              margin-bottom: 32px;
             }
-            .signature {
-              margin-top: 40px;
+            
+            
+            @media print {
+              body {
+                background-color: white;
+                padding: 0;
+              }
+              
+              .cover-letter-container {
+                box-shadow: none;
+                border-radius: 0;
+                padding: 20px;
+              }
             }
           </style>
         </head>
         <body>
-          <div class="date">${this.data.date}</div>
-          
-          <div class="recipient">
-            <div class="recipient-name">${this.data.recipientName}</div>
-            <div class="recipient-title">${this.data.recipientTitle}</div>
-            <div class="company-name">${this.data.companyName}</div>
-          </div>
-          
-          <div class="content">${this.data.content}</div>
-          
-          <div class="signature">
-            Sincerely,<br>
-            ${this.resumeData.name}<br>
-            ${this.resumeData.email}<br>
-            ${this.resumeData.phone}
+          <div class="cover-letter-container">
+            <div class="title">Ahmad Amin</div>
+            <div class="contact-info">${this.resumeData.email}</div>
+            <div class="contact-info">${this.resumeData.phone}</div>
+
+
+            <div class="header-section">
+              <div class="date">${this.data.date}</div>
+            </div>
+            
+            <div class="recipient-section">
+              <div class="recipient-name">${this.data.recipientName}</div>
+              <div class="recipient-title">${this.data.recipientTitle}</div>
+              <div class="company-name">${this.data.companyName}</div>
+            </div>
+            
+            <div class="content">${this.data.content}</div>
+            
+            <div class="signature-section">
+              <div>Sincerely,</div>
+              <div class="signature-name">${this.resumeData.name}</div>
+            </div>
           </div>
         </body>
       </html>
