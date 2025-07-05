@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer';
-import type { ResumeData } from './types';
+import type { ResumeData, CoverLetter } from './types';
 
 export class HTMLPDFGenerator {
   private data: ResumeData;
@@ -200,6 +200,113 @@ export class HTMLPDFGenerator {
                 <div class="school-info">${edu.school} • ${edu.location} • ${edu.year}</div>
               </div>
             `).join('')}
+          </div>
+        </body>
+      </html>
+    `;
+  }
+
+  async generate(): Promise<Buffer> {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+    
+    try {
+      const page = await browser.newPage();
+      const html = this.generateHTML();
+      
+      await page.setContent(html, { waitUntil: 'networkidle0' });
+      
+      const pdf = await page.pdf({
+        format: 'A4',
+        margin: {
+          top: '40px',
+          bottom: '40px',
+          left: '40px',
+          right: '40px'
+        },
+        printBackground: true
+      });
+      
+      return Buffer.from(pdf);
+    } finally {
+      await browser.close();
+    }
+  }
+}
+
+export class CoverLetterPDFGenerator {
+  private data: CoverLetter;
+  private resumeData: ResumeData;
+
+  constructor(data: CoverLetter, resumeData: ResumeData) {
+    this.data = data;
+    this.resumeData = resumeData;
+  }
+
+  private generateHTML(): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Cover Letter</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 0;
+              padding: 40px;
+              font-size: 12px;
+              line-height: 1.6;
+              color: #333;
+            }
+            .date {
+              text-align: right;
+              margin-bottom: 30px;
+              font-size: 12px;
+              color: #666;
+            }
+            .recipient {
+              margin-bottom: 30px;
+            }
+            .recipient-name {
+              font-weight: bold;
+              font-size: 14px;
+              margin-bottom: 5px;
+            }
+            .recipient-title {
+              font-size: 12px;
+              margin-bottom: 5px;
+            }
+            .company-name {
+              font-size: 12px;
+            }
+            .content {
+              margin-bottom: 30px;
+              white-space: pre-wrap;
+            }
+            .signature {
+              margin-top: 40px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="date">${this.data.date}</div>
+          
+          <div class="recipient">
+            <div class="recipient-name">${this.data.recipientName}</div>
+            <div class="recipient-title">${this.data.recipientTitle}</div>
+            <div class="company-name">${this.data.companyName}</div>
+          </div>
+          
+          <div class="content">${this.data.content}</div>
+          
+          <div class="signature">
+            Sincerely,<br>
+            ${this.resumeData.name}<br>
+            ${this.resumeData.email}<br>
+            ${this.resumeData.phone}
           </div>
         </body>
       </html>

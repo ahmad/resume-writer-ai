@@ -1,7 +1,89 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { defaultResumeData } from "../resume-config";
-import type { ResumeData } from "../types";
+import type { ResumeData, CoverLetter } from "../types";
+
+function CoverLetterPreview({ data, resumeData, isLoading }: { data: CoverLetter; resumeData: ResumeData; isLoading: boolean }) {
+  const handleDownload = async () => {
+    try {
+      // Create a blob URL for the PDF
+      const response = await fetch('/api/generate-pdf', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ type: 'cover-letter', data }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${data.recipientName.replace(/\s+/g, '_')}_cover_letter.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF. Please try again.');
+    }
+  };
+
+  return (
+    <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-4xl text-gray-900 text-sm relative">
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-xl z-10">
+          <div className="flex flex-col items-center gap-3">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <p className="text-gray-600 font-medium">Generating your cover letter...</p>
+          </div>
+        </div>
+      )}
+      
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold">Cover Letter</h2>
+        <button
+          onClick={handleDownload}
+          disabled={isLoading}
+          className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Download PDF
+        </button>
+      </div>
+
+              <div className="space-y-4">
+          <div className="text-right text-sm text-gray-600">
+            {data.date}
+          </div>
+          
+          <div className="space-y-2">
+            <div className="font-semibold">{data.recipientName}</div>
+            <div>{data.recipientTitle}</div>
+            <div>{data.companyName}</div>
+          </div>
+          
+          <div className="mt-6 leading-relaxed whitespace-pre-wrap">
+            {data.content}
+          </div>
+          
+          <div className="mt-8 text-sm text-gray-600">
+            <div>Sincerely,</div>
+            <div className="mt-2">
+              <div>{resumeData.name}</div>
+              <div>{resumeData.email}</div>
+              <div>{resumeData.phone}</div>
+            </div>
+          </div>
+        </div>
+    </div>
+  );
+}
 
 function ResumePreview({ data, isLoading }: { data: ResumeData; isLoading: boolean }) {
   const handleDownload = async () => {
@@ -12,7 +94,7 @@ function ResumePreview({ data, isLoading }: { data: ResumeData; isLoading: boole
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ type: 'resume', data }),
       });
       
       if (!response.ok) {
@@ -147,6 +229,55 @@ function ResumePreview({ data, isLoading }: { data: ResumeData; isLoading: boole
   );
 }
 
+function TabbedPreview({ 
+  resumeData, 
+  coverLetterData, 
+  isLoading, 
+  activeTab, 
+  onTabChange 
+}: { 
+  resumeData: ResumeData; 
+  coverLetterData: CoverLetter; 
+  isLoading: boolean; 
+  activeTab: 'resume' | 'cover-letter'; 
+  onTabChange: (tab: 'resume' | 'cover-letter') => void; 
+}) {
+  return (
+    <div className="w-full max-w-4xl">
+      {/* Tab Navigation */}
+      <div className="flex mb-6 bg-white rounded-lg shadow-sm p-1">
+        <button
+          onClick={() => onTabChange('resume')}
+          className={`flex-1 py-3 px-4 rounded-md font-semibold text-sm transition ${
+            activeTab === 'resume'
+              ? 'bg-blue-500 text-white shadow-sm'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+          }`}
+        >
+          Resume
+        </button>
+        <button
+          onClick={() => onTabChange('cover-letter')}
+          className={`flex-1 py-3 px-4 rounded-md font-semibold text-sm transition ${
+            activeTab === 'cover-letter'
+              ? 'bg-blue-500 text-white shadow-sm'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+          }`}
+        >
+          Cover Letter
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'resume' ? (
+        <ResumePreview data={resumeData} isLoading={isLoading} />
+      ) : (
+        <CoverLetterPreview data={coverLetterData} resumeData={resumeData} isLoading={isLoading} />
+      )}
+    </div>
+  );
+}
+
 function ChatPopup({ messages, isOpen, onClose }: { 
   messages: Array<{ sender: string; text: string }>; 
   isOpen: boolean; 
@@ -203,7 +334,15 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [resumeData, setResumeData] = useState(defaultResumeData);
+  const [coverLetterData, setCoverLetterData] = useState<CoverLetter>({
+    date: new Date().toISOString().slice(0, 10),
+    recipientName: "Hiring Manager",
+    recipientTitle: "Software Engineer",
+    companyName: "Tech Corp",
+    content: "Dear Hiring Manager,\n\nI am writing to express my interest in the Software Engineer position at Tech Corp. With a strong background in full-stack development and a passion for building scalable applications, I am excited about the opportunity to contribute to your team.\n\nMy experience includes:\n- Developing and maintaining robust web applications using React, Node.js, and PostgreSQL.\n- Implementing RESTful APIs and integrating third-party services.\n- Collaborating with cross-functional teams to deliver high-quality software solutions.\n\nI am particularly drawn to this role because of its focus on innovation and the chance to work on cutting-edge technologies. I am eager to bring my problem-solving skills and dedication to Tech Corp.\n\nThank you for considering my application. I look forward to discussing this opportunity with you.\n\nSincerely,\n[Your Name]\n[Your LinkedIn Profile]\n[Your Email]\n[Your Phone]",
+  });
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'resume' | 'cover-letter'>('resume');
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -233,11 +372,16 @@ export default function Home() {
       // Add AI response to messages
       setMessages((msgs) => [
         ...msgs,
-        { sender: "system", text: "I've analyzed your job description and updated your resume to better match the requirements." },
-        { sender: "system", text: data.content.changeSummary },
+        { sender: "system", text: "I've analyzed your job description and updated both your resume and cover letter to better match the requirements." },
+        { sender: "system", text: data.content.resume.changeSummary },
       ]);
       
-      setResumeData(data.content as ResumeData);
+      if (data.content.resume) {
+        setResumeData(data.content.resume as ResumeData);
+      }
+      if (data.content.coverLetter) {
+        setCoverLetterData(data.content.coverLetter as CoverLetter);
+      }
     } catch (error) {
       console.error('Error calling chat API:', error);
       setMessages((msgs) => [
@@ -304,7 +448,13 @@ export default function Home() {
 
       {/* Resume Preview */}
       <div className="flex justify-center items-center min-h-[calc(100vh-120px)] px-4 py-8">
-        <ResumePreview data={resumeData} isLoading={isLoading} />
+        <TabbedPreview 
+          resumeData={resumeData} 
+          coverLetterData={coverLetterData} 
+          isLoading={isLoading} 
+          activeTab={activeTab} 
+          onTabChange={setActiveTab} 
+        />
       </div>
 
       {/* Chat Popup */}

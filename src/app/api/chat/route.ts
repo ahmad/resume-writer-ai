@@ -76,6 +76,47 @@ Finally, after providing the updated resume, please also provide a brief summary
     `;
 }
 
+function generateCoverLetterPrompt(jobDescription: string, resumeData: any) {
+    return `
+Act as an expert cover letter writer. Your task is to create a compelling cover letter for the job application based on the job description and resume information provided.
+
+1. Resume Information:
+${JSON.stringify(resumeData)}
+
+2. Job Description:
+${jobDescription}
+
+3. Your Task:
+
+Create a professional cover letter that:
+- Addresses the hiring manager appropriately (use "Dear Hiring Manager" if no specific name is provided)
+- Opens with a strong hook that connects your background to the role
+- Demonstrates your understanding of the company and position
+- Highlights your most relevant experience and achievements from your resume
+- Shows enthusiasm for the opportunity
+- Closes with a call to action
+- Uses a professional tone throughout
+
+4. Output Format:
+
+Return the cover letter in the following JSON format:
+{
+  "recipientName": "Hiring Manager",
+  "recipientTitle": "[Job Title from description]",
+  "companyName": "[Company name extracted from description]",
+  "content": "Dear Hiring Manager,\n\n[Your cover letter content here with proper paragraphs separated by \\n\\n]",
+  "date": "[Current date in YYYY-MM-DD format]"
+}
+
+5. Important Notes:
+- Make the content specific to the job description
+- Use information from the resume to support your claims
+- Keep it concise but comprehensive (around 300-400 words)
+- Use proper business letter formatting
+- *DO NOT CHANGE THE FORMAT OF THE JSON OBJECT UNDER ANY CIRCUMSTANCES!*
+    `;
+}
+
 export async function POST(request: NextRequest) {
     try {
         const { jobDescription } = await request.json();
@@ -84,42 +125,67 @@ export async function POST(request: NextRequest) {
             apiKey: process.env.GOOGLE_API_KEY,
         });
 
-        const response = await genai.models.generateContent({
-            model: "gemini-2.5-pro", // gemini-2.5-flash
+        // Generate resume
+        const resumeResponse = await genai.models.generateContent({
+            model: "gemini-2.5-pro",
             contents: generateResumePrompt(jobDescription),
             config: {
                 responseMimeType: "application/json",
             }
         });
 
-        console.log(response);
-        // Extract and clean the response content
-        const rawResponseText = response.text || JSON.stringify(response);
-        const cleanedResponseText = cleanAIResponse(rawResponseText);
+        // Extract and clean the resume response
+        const rawResumeText = resumeResponse.text || JSON.stringify(resumeResponse);
+        const cleanedResumeText = cleanAIResponse(rawResumeText);
         
-        // Parse the cleaned JSON response
-        let parsedContent;
+        let parsedResume;
         try {
-            parsedContent = JSON.parse(cleanedResponseText);
+            parsedResume = JSON.parse(cleanedResumeText);
         } catch (parseError) {
-            console.error('Failed to parse cleaned response as JSON:', parseError);
-            // If parsing fails, return the cleaned text as a fallback
-            return NextResponse.json({ 
-                success: true, 
-                content: { rawResponse: cleanedResponseText } 
-            });
+            console.error('Failed to parse resume response as JSON:', parseError);
+            parsedResume = { rawResponse: cleanedResumeText };
+        }
+
+        // Generate cover letter using the updated resume data
+        const coverLetterResponse = await genai.models.generateContent({
+            model: "gemini-2.5-pro",
+            contents: generateCoverLetterPrompt(jobDescription, parsedResume),
+            config: {
+                responseMimeType: "application/json",
+            }
+        });
+
+        // Extract and clean the cover letter response
+        const rawCoverLetterText = coverLetterResponse.text || JSON.stringify(coverLetterResponse);
+        const cleanedCoverLetterText = cleanAIResponse(rawCoverLetterText);
+        
+        let parsedCoverLetter;
+        try {
+            parsedCoverLetter = JSON.parse(cleanedCoverLetterText);
+        } catch (parseError) {
+            console.error('Failed to parse cover letter response as JSON:', parseError);
+            parsedCoverLetter = {
+                recipientName: "Hiring Manager",
+                recipientTitle: "Software Engineer",
+                companyName: "Company",
+                content: "Dear Hiring Manager,\n\nI am writing to express my interest in the position. Please see my attached resume for my qualifications.\n\nSincerely,\n[Your Name]",
+                date: new Date().toISOString().slice(0, 10)
+            };
         }
         
         return NextResponse.json({ 
             success: true, 
-            content: parsedContent 
+            content: {
+                resume: parsedResume,
+                coverLetter: parsedCoverLetter
+            }
         });
     } catch (error) {
-        console.error('Error generating resume:', error);
+        console.error('Error generating resume and cover letter:', error);
         return NextResponse.json(
             { 
                 success: false, 
-                error: 'Failed to generate resume' 
+                error: 'Failed to generate resume and cover letter' 
             }, 
             { status: 500 }
         );
