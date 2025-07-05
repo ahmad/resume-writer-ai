@@ -98,6 +98,24 @@ export const deleteResume = async (resumeId: string): Promise<void> => {
   await deleteDoc(resumeRef);
 };
 
+// Duplicate a resume
+export const duplicateResume = async (userId: string, resumeId: string): Promise<string> => {
+  const originalResume = await getResumeData(resumeId);
+  if (!originalResume) {
+    throw new Error('Resume not found');
+  }
+
+  // Create a copy with a new name
+  const duplicatedResume: ResumeData = {
+    ...originalResume,
+    resumeName: `${originalResume.resumeName || 'Untitled Resume'} (Copy)`,
+    changeSummary: ''
+  };
+
+  // Save the duplicated resume
+  return await saveResumeData(userId, duplicatedResume);
+};
+
 // Save user preferences
 export const saveUserPreferences = async (userId: string, preferences: any): Promise<void> => {
   const userRef = doc(db, 'users', userId);

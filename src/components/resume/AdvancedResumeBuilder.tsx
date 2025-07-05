@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ResumeData, Experience, Education, Project } from '../../types';
-import { saveResumeData, getResumeData, getUserResumes, deleteResume } from '../../lib/firestore';
+import { saveResumeData, getResumeData, getUserResumes, deleteResume, duplicateResume } from '../../lib/firestore';
 import ResumeForm from './ResumeForm';
 import ResumePreview from './ResumePreview';
 import ResumeList from './ResumeList';
@@ -116,6 +116,22 @@ export default function AdvancedResumeBuilder() {
     }
   };
 
+  const handleDuplicateResume = async (resumeId: string) => {
+    if (!user) return;
+
+    setIsLoading(true);
+    try {
+      await duplicateResume(user.uid, resumeId);
+      await loadUserResumes(); // Refresh the list
+      alert('Resume duplicated successfully!');
+    } catch (error) {
+      console.error('Error duplicating resume:', error);
+      alert('Error duplicating resume. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleDataChange = (newData: Partial<ResumeData>) => {
     setResumeData(prev => ({ ...prev, ...newData }));
   };
@@ -188,6 +204,7 @@ export default function AdvancedResumeBuilder() {
                 onCreateNew={handleCreateNew}
                 onEditResume={handleEditResume}
                 onDeleteResume={handleDeleteResume}
+                onDuplicateResume={handleDuplicateResume}
               />
             )}
 
