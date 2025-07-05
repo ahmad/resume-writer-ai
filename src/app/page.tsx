@@ -210,7 +210,7 @@ export default function Home() {
         <div className="bg-white shadow-sm border-b">
           <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div className="flex items-center gap-6">
-              <h1 className="text-xl font-bold text-gray-900">AI Resume Builder</h1>
+              <h1 className="text-xl font-bold text-gray-900">ResumeOracle</h1>
               <Link 
                 href="/builder"
                 className="text-sm text-blue-600 hover:text-blue-800 font-medium"

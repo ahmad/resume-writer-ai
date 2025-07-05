@@ -1,6 +1,10 @@
 import { ResumeData } from "@/types";
 
 export default function ResumePreview({ data, isLoading }: { data: ResumeData; isLoading: boolean }) {
+  if (Object.keys(data).length === 0) {
+    return <div>No data</div>;
+  }
+
     const handleDownload = async () => {
       try {
         // Create a blob URL for the PDF

@@ -10,7 +10,25 @@ import ResumeList from './ResumeList';
 
 export default function AdvancedResumeBuilder() {
   const { user } = useAuth();
-  const [resumeData, setResumeData] = useState<ResumeData>({} as ResumeData);
+  
+  const getDefaultResumeData = (): ResumeData => ({
+    changeSummary: '',
+    name: '',
+    title: '',
+    location: '',
+    email: '',
+    phone: '',
+    github: '',
+    linkedin: '',
+    website: '',
+    summary: '',
+    skills: {},
+    experience: [],
+    education: [],
+    projects: []
+  });
+
+  const [resumeData, setResumeData] = useState<ResumeData>(getDefaultResumeData());
   const [currentResumeId, setCurrentResumeId] = useState<string | null>(null);
   const [userResumes, setUserResumes] = useState<Array<ResumeData & { id: string; updatedAt: any }>>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +57,7 @@ export default function AdvancedResumeBuilder() {
   };
 
   const handleCreateNew = () => {
-    setResumeData({} as ResumeData);
+    setResumeData(getDefaultResumeData());
     setCurrentResumeId(null);
     setViewMode('form');
   };
@@ -86,7 +104,7 @@ export default function AdvancedResumeBuilder() {
       await loadUserResumes(); // Refresh the list
       if (currentResumeId === resumeId) {
         setCurrentResumeId(null);
-        setResumeData({} as ResumeData);
+        setResumeData(getDefaultResumeData());
       }
       alert('Resume deleted successfully!');
     } catch (error) {

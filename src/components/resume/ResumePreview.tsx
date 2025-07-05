@@ -8,6 +8,10 @@ interface ResumePreviewProps {
 }
 
 export default function ResumePreview({ data }: ResumePreviewProps) {
+  if (Object.keys(data).length === 0) {
+    return <div>No data</div>;
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
       {/* Header */}
