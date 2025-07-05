@@ -13,6 +13,7 @@ export default function AdvancedResumeBuilder() {
   
   const getDefaultResumeData = (): ResumeData => ({
     changeSummary: '',
+    resumeName: '',
     name: '',
     title: '',
     location: '',

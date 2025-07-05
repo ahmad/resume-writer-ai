@@ -141,7 +141,7 @@ export default function ResumeSelector({ onResumeSelect, onCancel }: ResumeSelec
                             className="text-blue-600 focus:ring-blue-500"
                           />
                           <h3 className="font-semibold text-gray-900">
-                            {resume.name || 'Untitled Resume'}
+                            {resume.resumeName || 'Untitled Resume'}
                           </h3>
                           {resume.title && (
                             <span className="text-sm text-gray-500">({resume.title})</span>

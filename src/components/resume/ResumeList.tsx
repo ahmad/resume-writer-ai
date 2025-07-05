@@ -77,7 +77,7 @@ export default function ResumeList({
               <div className="p-6 border-b border-gray-200">
                 <div className="flex justify-between items-start mb-3">
                   <h3 className="text-lg font-semibold text-gray-900 truncate">
-                    {resume.name || 'Untitled Resume'}
+                    {resume.resumeName || 'Untitled Resume'}
                   </h3>
                   <div className="flex space-x-2">
                     <button

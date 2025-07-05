@@ -16,13 +16,14 @@ export async function POST(request: NextRequest) {
       const resumeData = data as ResumeData;
       const generator = new HTMLPDFGenerator(resumeData);
       buffer = await generator.generate();
-      filename = `${resumeData.name.replace(/\s+/g, '_')}_resume.pdf`;
+      filename = `${resumeData.resumeName.replace(/\s+/g, '_') || resumeData.name.replace(/\s+/g, '_')}_resume.pdf`;
     } else if (type === 'cover-letter') {
       const coverLetterData = data as CoverLetter;
       // For cover letter, we need resume data for the signature
       // This is a simplified approach - in a real app you might want to pass resume data separately
       const generator = new CoverLetterPDFGenerator(coverLetterData, {
         changeSummary: '',
+        resumeName: '',
         name: 'Ahmad Amin',
         email: 'info@ahmadamin.com',
         phone: '+1(347) 527-8553',

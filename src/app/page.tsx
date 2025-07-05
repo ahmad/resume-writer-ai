@@ -237,7 +237,7 @@ export default function Home() {
                     <div className="flex items-center gap-3">
                       <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                       <span className="text-sm font-medium text-blue-900">
-                        Using resume: {selectedResume.name || 'Untitled Resume'}
+                        Using resume: {selectedResume.resumeName || 'Untitled Resume'}
                       </span>
                       {selectedResume.title && (
                         <span className="text-sm text-blue-700">({selectedResume.title})</span>

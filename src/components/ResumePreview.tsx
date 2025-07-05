@@ -24,7 +24,7 @@ export default function ResumePreview({ data, isLoading }: { data: ResumeData; i
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${data.name.replace(/\s+/g, '_')}_resume.pdf`;
+        a.download = `${data.resumeName.replace(/\s+/g, '_') || data.name.replace(/\s+/g, '_')}_resume.pdf`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);

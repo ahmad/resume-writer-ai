@@ -134,6 +134,17 @@ export default function ResumeForm({ data, onChange }: ResumeFormProps) {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
+                <label className="block text-sm font-medium text-gray-700">Resume Name</label>
+                <input
+                  type="text"
+                  value={data.resumeName}
+                  onChange={(e) => updateField('resumeName', e.target.value)}
+                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-black"
+                  placeholder="e.g., Software Engineer Resume, Marketing Manager Resume"
+                />
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-gray-700">Full Name</label>
                 <input
                   type="text"

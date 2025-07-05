@@ -1,5 +1,6 @@
 export interface ResumeData {
   changeSummary: string;
+  resumeName: string;
   name: string;
   title: string;
   location: string;
