@@ -2,6 +2,9 @@
 import { useState, useRef, useEffect } from "react";
 import { defaultResumeData } from "../resume-config";
 import type { ResumeData, CoverLetter } from "../types";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { UserProfile } from "@/components/auth/UserProfile";
+import { ResumeManager } from "@/components/resume/ResumeManager";
 
 function CoverLetterPreview({ data, resumeData, isLoading }: { data: CoverLetter; resumeData: ResumeData; isLoading: boolean }) {
   const handleDownload = async () => {
@@ -403,66 +406,82 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Chat Input at Top */}
-      <div className="bg-white shadow-sm border-b sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex flex-col gap-4">
-            <textarea
-              className="w-full text-black px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
-              placeholder="Paste your job description here..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              rows={4}
-              style={{ minHeight: '120px', maxHeight: '200px' }}
-            />
-            <div className="flex gap-2">
-              <button
-                className="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                onClick={handleSend}
-                disabled={isLoading || !input.trim()}
-              >
-                {isLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    <span>Generating...</span>
-                  </>
-                ) : (
-                  <span>Send</span>
-                )}
-              </button>
-              <button
-                onClick={() => setIsChatOpen(true)}
-                className="bg-gray-100 text-gray-700 px-4 py-3 rounded-lg font-semibold hover:bg-gray-200 transition flex items-center gap-2"
-              >
-                <span>Chat History</span>
-                <span className="bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {messages.length - 1}
-                </span>
-              </button>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header with User Profile */}
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <h1 className="text-xl font-bold text-gray-900">Resume Writer AI</h1>
+            <div className="flex items-center gap-4">
+              <ResumeManager 
+                currentResume={resumeData} 
+                onLoadResume={setResumeData} 
+              />
+              <UserProfile />
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Resume Preview */}
-      <div className="flex justify-center items-center min-h-[calc(100vh-120px)] px-4 py-8">
-        <TabbedPreview 
-          resumeData={resumeData} 
-          coverLetterData={coverLetterData} 
-          isLoading={isLoading} 
-          activeTab={activeTab} 
-          onTabChange={setActiveTab} 
+        {/* Chat Input */}
+        <div className="bg-white shadow-sm border-b sticky top-0 z-40">
+          <div className="max-w-6xl mx-auto px-4 py-4">
+            <div className="flex flex-col gap-4">
+              <textarea
+                className="w-full text-black px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                placeholder="Paste your job description here..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                rows={4}
+                style={{ minHeight: '120px', maxHeight: '200px' }}
+              />
+              <div className="flex gap-2">
+                <button
+                  className="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  onClick={handleSend}
+                  disabled={isLoading || !input.trim()}
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Generating...</span>
+                    </>
+                  ) : (
+                    <span>Send</span>
+                  )}
+                </button>
+                <button
+                  onClick={() => setIsChatOpen(true)}
+                  className="bg-gray-100 text-gray-700 px-4 py-3 rounded-lg font-semibold hover:bg-gray-200 transition flex items-center gap-2"
+                >
+                  <span>Chat History</span>
+                  <span className="bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {messages.length - 1}
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Resume Preview */}
+        <div className="flex justify-center items-center min-h-[calc(100vh-180px)] px-4 py-8">
+          <TabbedPreview 
+            resumeData={resumeData} 
+            coverLetterData={coverLetterData} 
+            isLoading={isLoading} 
+            activeTab={activeTab} 
+            onTabChange={setActiveTab} 
+          />
+        </div>
+
+        {/* Chat Popup */}
+        <ChatPopup 
+          messages={messages} 
+          isOpen={isChatOpen} 
+          onClose={() => setIsChatOpen(false)} 
         />
       </div>
-
-      {/* Chat Popup */}
-      <ChatPopup 
-        messages={messages} 
-        isOpen={isChatOpen} 
-        onClose={() => setIsChatOpen(false)} 
-      />
-    </div>
+    </ProtectedRoute>
   );
 }
