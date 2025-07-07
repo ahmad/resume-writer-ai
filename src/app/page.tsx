@@ -5,7 +5,7 @@ import type { ResumeData, CoverLetter } from "../types";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { UserProfile } from "@/components/auth/UserProfile";
 import ResumeSelector from "@/components/resume/ResumeSelector";
-import ResumePreview from "@/components/ResumePreview";
+import ResumePreview from "@/components/resume/ResumePreview";
 import CoverLetterPreview from "@/components/CoverLetter";
 
 function TabbedPreview({ 
@@ -143,7 +143,9 @@ export default function Home() {
     
     try {
       setIsLoading(true);
-      const response = await fetch('/api/chat', {
+      
+      // Generate resume
+      const resumeResponse = await fetch('/api/generate/resume', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -154,27 +156,45 @@ export default function Home() {
         }),
       });
       
-      if (!response.ok) {
-        throw new Error('Failed to get response from AI');
+      if (!resumeResponse.ok) {
+        throw new Error('Failed to generate resume');
       }
       
-      const data = await response.json();
+      const resumeData = await resumeResponse.json();
+      
+      // Generate cover letter using the updated resume data
+      const coverLetterResponse = await fetch('/api/generate/cover-letter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          jobDescription: userMessage,
+          resumeData: resumeData.content 
+        }),
+      });
+      
+      if (!coverLetterResponse.ok) {
+        throw new Error('Failed to generate cover letter');
+      }
+      
+      const coverLetterData = await coverLetterResponse.json();
       
       // Add AI response to messages
       setMessages((msgs) => [
         ...msgs,
         { sender: "system", text: "I've analyzed your job description and updated both your resume and cover letter to better match the requirements." },
-        { sender: "system", text: data.content.resume.changeSummary },
+        { sender: "system", text: resumeData.content.changeSummary || "Resume and cover letter have been updated successfully." },
       ]);
       
-      if (data.content.resume) {
-        setResumeData(data.content.resume as ResumeData);
+      if (resumeData.content) {
+        setResumeData(resumeData.content as ResumeData);
       }
-      if (data.content.coverLetter) {
-        setCoverLetterData(data.content.coverLetter as CoverLetter);
+      if (coverLetterData.content) {
+        setCoverLetterData(coverLetterData.content as CoverLetter);
       }
     } catch (error) {
-      console.error('Error calling chat API:', error);
+      console.error('Error generating resume and cover letter:', error);
       setMessages((msgs) => [
         ...msgs,
         { sender: "system", text: "Sorry, there was an error processing your request. Please try again." },

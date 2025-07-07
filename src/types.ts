@@ -16,7 +16,9 @@ export interface ResumeData {
   experience: Experience[];
   education: Education[];
   projects: Project[];
+  generated?: boolean;
 }
+
 
 export interface CoverLetter {
   recipientName: string;

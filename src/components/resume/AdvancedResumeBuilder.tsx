@@ -242,7 +242,7 @@ export default function AdvancedResumeBuilder() {
                     Back to Editor
                   </button>
                 </div>
-                <ResumePreview data={resumeData} />
+                <ResumePreview data={resumeData} isLoading={isLoading} />
               </div>
             )}
           </>
