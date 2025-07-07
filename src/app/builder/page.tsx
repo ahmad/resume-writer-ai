@@ -16,7 +16,7 @@ export default function BuilderPage() {
             <div className="flex items-center gap-6">
               <h1 className="text-xl font-bold text-gray-900">ResumeOracle</h1>
               <Link 
-                href="/"
+                href="/ai"
                 className="text-sm text-blue-600 hover:text-blue-800 font-medium"
               >
                 ← Back to AI Builder
