@@ -164,9 +164,23 @@ export const saveJobData = async (userId: string, jobData: Omit<JobData, 'id' | 
     updatedAt: now
   };
 
+  // Save to user's jobs collection
   const jobsRef = collection(db, 'users', userId, 'jobs');
   const newJobRef = doc(jobsRef);
   await setDoc(newJobRef, jobWithMetadata);
+  
+  // Also save to global queue collection with job document ID
+  const queueRef = collection(db, 'jobQueue');
+  const queueJobRef = doc(queueRef);
+  const queueJobData = {
+    ...jobWithMetadata,
+    jobDocumentId: newJobRef.id, // Include the job document ID
+    queueId: queueJobRef.id,
+    createdAt: now,
+    updatedAt: now
+  };
+  await setDoc(queueJobRef, queueJobData);
+  
   return newJobRef.id;
 };
 
