@@ -3,10 +3,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ResumeData } from '../../types';
-import { saveResumeData, getResumeData, getUserResumes, deleteResume, duplicateResume } from '../../lib/firestore';
+import { saveResumeData, getResumeData, getUserResumes, deleteResume, duplicateResume, saveJobData } from '../../lib/firestore';
 import ResumeForm from './ResumeForm';
 import ResumePreview from './ResumePreview';
 import ResumeList from './ResumeList';
+import AIResumeGenerator from './AIResumeGenerator';
+
+
+
+export interface Resume extends ResumeData {
+  id: string;
+  updatedAt: unknown;
+}
 
 export default function AdvancedResumeBuilder() {
   const { user } = useAuth();
@@ -31,10 +39,11 @@ export default function AdvancedResumeBuilder() {
 
   const [resumeData, setResumeData] = useState<ResumeData>(getDefaultResumeData());
   const [currentResumeId, setCurrentResumeId] = useState<string | null>(null);
-  const [userResumes, setUserResumes] = useState<Array<ResumeData & { id: string; updatedAt: unknown }>>([]);
+  const [userResumes, setUserResumes] = useState<Array<Resume>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'form' | 'preview' | 'list'>('list');
   const [isSaving, setIsSaving] = useState(false);
+  const [showAIGenerator, setShowAIGenerator] = useState(false);
 
   const loadUserResumes = useCallback(async () => {
     if (!user) return;
@@ -136,6 +145,41 @@ export default function AdvancedResumeBuilder() {
     setResumeData(prev => ({ ...prev, ...newData }));
   };
 
+  const handleGenerateAIResume = () => {
+    setShowAIGenerator(true);
+  };
+
+  const handleAIGenerate = async (data: {
+    jobDescription: string;
+    selectedResume: ResumeData;
+    jobUrl?: string;
+  }) => {
+    if (!user) return;
+
+    try {
+      // Save job data to Firestore
+      const jobId = await saveJobData(user.uid, {
+        jobDescription: data.jobDescription,
+        selectedResume: data.selectedResume,
+        jobUrl: data.jobUrl
+      });
+
+      console.log('Job saved successfully with ID:', jobId);
+      
+      // TODO: Trigger AI processing here
+      // This could be a Cloud Function or API call to process the job
+      
+      alert('Job submitted successfully! Your AI-tailored resume will be ready soon.');
+      
+      // Optionally, you could redirect to a jobs page or show a status indicator
+      // setViewMode('jobs'); // if you have a jobs view
+      
+    } catch (error) {
+      console.error('Error saving job data:', error);
+      alert('Error submitting job. Please try again.');
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -201,6 +245,7 @@ export default function AdvancedResumeBuilder() {
             {viewMode === 'list' && (
               <ResumeList
                 resumes={userResumes}
+                onGenerateAIResume={handleGenerateAIResume}
                 onCreateNew={handleCreateNew}
                 onEditResume={handleEditResume}
                 onDeleteResume={handleDeleteResume}
@@ -248,6 +293,14 @@ export default function AdvancedResumeBuilder() {
           </>
         )}
       </div>
+
+      {/* AI Resume Generator Popover */}
+      <AIResumeGenerator
+        resumes={userResumes}
+        onGenerate={handleAIGenerate}
+        onClose={() => setShowAIGenerator(false)}
+        isOpen={showAIGenerator}
+      />
     </div>
   );
 } 

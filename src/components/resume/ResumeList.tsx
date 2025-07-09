@@ -9,6 +9,7 @@ interface ResumeListProps {
   onEditResume: (resumeId: string) => void;
   onDeleteResume: (resumeId: string) => void;
   onDuplicateResume: (resumeId: string) => void;
+  onGenerateAIResume: () => void;
 }
 
 export default function ResumeList({ 
@@ -16,7 +17,8 @@ export default function ResumeList({
   onCreateNew, 
   onEditResume, 
   onDeleteResume,
-  onDuplicateResume
+  onDuplicateResume,
+  onGenerateAIResume
 }: ResumeListProps) {
   const formatDate = (timestamp: unknown) => {
     if (!timestamp) return 'Unknown';
@@ -43,12 +45,22 @@ export default function ResumeList({
           <h2 className="text-2xl font-bold text-gray-900">My Resumes</h2>
           <p className="text-gray-600 mt-1">Manage and edit your professional resumes</p>
         </div>
+        <div className="flex gap-2">
+
+        <button
+          onClick={onGenerateAIResume}
+          className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+        >
+          Generate AI Resume
+        </button>
+
         <button
           onClick={onCreateNew}
           className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
         >
           Create New Resume
         </button>
+        </div>
       </div>
 
       {/* Resume List */}

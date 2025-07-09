@@ -14,6 +14,18 @@ import {
 import { db } from './firebase';
 import { ResumeData } from '../types';
 
+// Job data interface
+export interface JobData {
+  id?: string;
+  userId: string;
+  jobDescription: string;
+  selectedResume: ResumeData;
+  jobUrl?: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
 // Legacy resume data interface (keeping for backward compatibility)
 export interface LegacyResumeData {
   id?: string;
@@ -135,6 +147,57 @@ export const getUserPreferences = async (userId: string): Promise<unknown> => {
     return userSnap.data().preferences || {};
   }
   return {};
+};
+
+// Save job data for AI resume generation
+export const saveJobData = async (userId: string, jobData: Omit<JobData, 'id' | 'userId' | 'status' | 'createdAt' | 'updatedAt'>): Promise<string> => {
+  if (jobData.jobUrl === undefined) {
+    jobData.jobUrl = '';
+  }
+  
+  const now = Timestamp.now();
+  const jobWithMetadata: JobData = {
+    ...jobData,
+    userId,
+    status: 'pending',
+    createdAt: now,
+    updatedAt: now
+  };
+
+  const jobsRef = collection(db, 'users', userId, 'jobs');
+  const newJobRef = doc(jobsRef);
+  await setDoc(newJobRef, jobWithMetadata);
+  return newJobRef.id;
+};
+
+// Get all jobs for a user
+export const getUserJobs = async (userId: string): Promise<Array<JobData & { id: string }>> => {
+  const jobsRef = collection(db, 'users', userId, 'jobs');
+  const q = query(
+    jobsRef,
+    orderBy('createdAt', 'desc')
+  );
+  
+  const querySnapshot = await getDocs(q);
+  const jobs: Array<JobData & { id: string }> = [];
+  
+  querySnapshot.forEach((doc) => {
+    jobs.push({ 
+      id: doc.id, 
+      ...doc.data() 
+    } as JobData & { id: string });
+  });
+  
+  return jobs;
+};
+
+// Update job status
+export const updateJobStatus = async (userId: string, jobId: string, status: JobData['status']): Promise<void> => {
+  const jobRef = doc(db, 'users', userId, 'jobs', jobId);
+  await updateDoc(jobRef, {
+    status,
+    updatedAt: Timestamp.now()
+  });
 };
 
 // Legacy functions for backward compatibility
