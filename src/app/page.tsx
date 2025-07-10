@@ -28,16 +28,10 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/ai"
+                href="/builder"
                 className="bg-blue-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-600 transition text-lg"
               >
-                Start with AI Assistant
-              </Link>
-              <Link
-                href="/builder"
-                className="bg-gray-100 text-gray-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-200 transition text-lg"
-              >
-                Advanced Builder
+                Start with AI Builder
               </Link>
             </div>
           </div>
