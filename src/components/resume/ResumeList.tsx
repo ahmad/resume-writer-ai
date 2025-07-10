@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { ResumeData } from '../../types';
 import { getUserJobs, JobData } from '../../lib/firestore';
 import { useAuth } from '../../contexts/AuthContext';
+import Link from 'next/link';
 
 interface ResumeListProps {
   resumes: Array<ResumeData & { id: string; updatedAt: unknown }>;
@@ -384,9 +385,10 @@ export default function ResumeList({
                     </div>
                     <div className="flex gap-2">
                       {job.status === 'completed' && (
-                        <button className="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors">
+                        <Link href={`/jobs/${job.id}`} className="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors">
+                          
                           View Result
-                        </button>
+                        </Link>
                       )}
                       {job.status === 'failed' && (
                         <button className="px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700 transition-colors">

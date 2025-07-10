@@ -163,16 +163,6 @@ export default function AdvancedResumeBuilder() {
         selectedResume: data.selectedResume,
         jobUrl: data.jobUrl
       });
-
-      console.log('Job saved successfully with ID:', jobId);
-      
-      // TODO: Trigger AI processing here
-      // This could be a Cloud Function or API call to process the job
-      
-      alert('Job submitted successfully! Your AI-tailored resume will be ready soon.');
-      
-      // Optionally, you could redirect to a jobs page or show a status indicator
-      // setViewMode('jobs'); // if you have a jobs view
       
     } catch (error) {
       console.error('Error saving job data:', error);

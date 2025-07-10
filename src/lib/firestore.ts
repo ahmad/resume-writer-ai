@@ -19,6 +19,7 @@ export interface JobData {
   id?: string;
   userId: string;
   jobDescription: string;
+  aiResume?: ResumeData;
   selectedResume: ResumeData;
   jobUrl?: string;
   status: 'pending' | 'processing' | 'completed' | 'failed';
@@ -64,6 +65,22 @@ export const saveResumeData = async (userId: string, resumeData: ResumeData, res
     return newResumeRef.id;
   }
 };
+
+
+export const getUserGeneratedResumes = async (userId: string, jobId: string): Promise<JobData | null> => {
+  const job = doc(db, 'users', userId, 'jobs', jobId);
+  const jobDoc = await getDoc(job);
+  if (!jobDoc.exists()) {
+    return null;
+  }
+
+  const jobData = jobDoc.data();
+  if (!jobData) {
+    return null;
+  }
+
+  return jobData as JobData;
+}
 
 // Get a single resume by ID
 export const getResumeData = async (resumeId: string): Promise<ResumeData | null> => {
