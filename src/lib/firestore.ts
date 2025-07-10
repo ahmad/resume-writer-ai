@@ -231,6 +231,15 @@ export const updateJobStatus = async (userId: string, jobId: string, status: Job
   });
 };
 
+// Update AI resume in job data
+export const updateAIResume = async (userId: string, jobId: string, aiResume: ResumeData): Promise<void> => {
+  const jobRef = doc(db, 'users', userId, 'jobs', jobId);
+  await updateDoc(jobRef, {
+    aiResume,
+    updatedAt: Timestamp.now()
+  });
+};
+
 // Legacy functions for backward compatibility
 export const saveResume = async (resumeData: LegacyResumeData): Promise<void> => {
   const now = Timestamp.now();

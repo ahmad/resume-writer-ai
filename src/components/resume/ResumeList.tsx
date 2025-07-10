@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ResumeData } from '../../types';
 import { getUserJobs, JobData } from '../../lib/firestore';
 import { useAuth } from '../../contexts/AuthContext';
@@ -27,7 +27,7 @@ export default function ResumeList({
   const [aiJobs, setAiJobs] = useState<Array<JobData & { id: string }>>([]);
   const [isLoadingJobs, setIsLoadingJobs] = useState(false);
 
-  const loadAIJobs = async () => {
+  const loadAIJobs = useCallback(async () => {
     if (!user) return;
     
     setIsLoadingJobs(true);
@@ -39,11 +39,11 @@ export default function ResumeList({
     } finally {
       setIsLoadingJobs(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     loadAIJobs();
-  }, [user]);
+  }, [loadAIJobs]);
 
   const formatDate = (timestamp: unknown) => {
     if (!timestamp) return 'Unknown';

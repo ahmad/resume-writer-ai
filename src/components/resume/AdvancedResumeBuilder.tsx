@@ -158,7 +158,7 @@ export default function AdvancedResumeBuilder() {
 
     try {
       // Save job data to Firestore
-      const jobId = await saveJobData(user.uid, {
+      await saveJobData(user.uid, {
         jobDescription: data.jobDescription,
         selectedResume: data.selectedResume,
         jobUrl: data.jobUrl
