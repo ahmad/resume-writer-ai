@@ -328,50 +328,36 @@ export default function ResumeList({
             </button>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-2">
             {aiJobs.map((job) => (
               <div
                 key={job.id}
                 className="bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow"
               >
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
+                <div className="p-4">
+                  <div className="flex justify-between items-start mb-2">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-base font-semibold text-gray-900">
                           {job.selectedResume.resumeName || 'Untitled Resume'}
                         </h3>
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
                           {getStatusIcon(job.status)}
                           {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
                         </span>
                       </div>
-                      <p className="text-gray-600 text-sm mb-2">
-                        Created: {formatDate(job.createdAt)}
-                      </p>
-                      {job.jobUrl && (
-                        <a
-                          href={job.jobUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 text-sm inline-flex items-center gap-1"
-                        >
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                          </svg>
-                          View Job Posting
-                        </a>
-                      )}
+                      <div className="flex items-center gap-4 text-xs text-gray-600 mb-2">
+                        <span>Created: {formatDate(job.createdAt)}</span>
+                      </div>
                     </div>
                   </div>
 
                   {/* Job Description Preview */}
-                  <div className="mb-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Job Description</h4>
-                    <div className="bg-gray-50 rounded-md p-3">
-                      <p className="text-sm text-gray-800 line-clamp-3">
-                        {job.jobDescription.length > 200 
-                          ? `${job.jobDescription.substring(0, 200)}...` 
+                  <div className="mb-2">
+                    <div className="bg-gray-50 rounded-md p-2">
+                      <p className="text-xs text-gray-800 line-clamp-2">
+                        {job.jobDescription.length > 150 
+                          ? `${job.jobDescription.substring(0, 150)}...` 
                           : job.jobDescription
                         }
                       </p>
@@ -379,25 +365,37 @@ export default function ResumeList({
                   </div>
 
                   {/* Status-specific actions */}
-                  <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                  <div className="flex justify-between items-center pt-2 border-t border-gray-200">
                     <div className="text-xs text-gray-500">
-                      Last updated: {formatDate(job.updatedAt)}
+                      Updated: {formatDate(job.updatedAt)}
                     </div>
                     <div className="flex gap-2">
+                      {job.jobUrl && (
+                        <a
+                          href={job.jobUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors inline-flex items-center gap-1"
+                        >
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                          View Job
+                        </a>
+                      )}
                       {job.status === 'completed' && (
-                        <Link href={`/jobs/${job.id}`} className="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors">
-                          
+                        <Link href={`/jobs/${job.id}`} className="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors">
                           View Result
                         </Link>
                       )}
                       {job.status === 'failed' && (
-                        <button className="px-3 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700 transition-colors">
+                        <button className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700 transition-colors">
                           Retry
                         </button>
                       )}
                       {(job.status === 'pending' || job.status === 'processing') && (
                         <div className="text-xs text-gray-500">
-                          Processing your request...
+                          Processing...
                         </div>
                       )}
                     </div>

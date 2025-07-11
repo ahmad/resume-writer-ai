@@ -23,16 +23,27 @@ export default function GeneratePage({ params }: { params: Promise<{ jobId: stri
 
     useEffect(() => {
         const fetchResume = async () => {
-            const resume = await getUserGeneratedResumes(user?.uid || '', jobId);
-
-            if (!resume) {
+            if (!user?.uid) {
+                console.log('User not authenticated, skipping fetch');
                 setIsLoading(false);
                 return;
             }
 
-            console.log(resume);
-            setJob(resume);
-            setIsLoading(false);
+            try {
+                const resume = await getUserGeneratedResumes(user.uid, jobId);
+
+                if (!resume) {
+                    setIsLoading(false);
+                    return;
+                }
+
+                console.log("Job", resume);
+                setJob(resume);
+            } catch (error) {
+                console.error('Error fetching resume:', error);
+            } finally {
+                setIsLoading(false);
+            }
         }
 
         fetchResume();
@@ -48,6 +59,8 @@ export default function GeneratePage({ params }: { params: Promise<{ jobId: stri
 
     const currentResume = selectedVersion === 'ai' ? job.aiResume : job.selectedResume;
     const hasAiVersion = !!job.aiResume;
+
+    console.log("currentResume",currentResume);
 
     const handleEditResume = () => {
         if (selectedVersion === 'ai' && job.aiResume) {
@@ -102,9 +115,27 @@ export default function GeneratePage({ params }: { params: Promise<{ jobId: stri
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">
                                 Resume for Job Application
                             </h1>
-                            <p className="text-gray-600">
+                            <p className="text-gray-600 mb-4">
                                 {job.selectedResume.resumeName}
                             </p>
+                            {job.jobUrl && (
+                                <div className="flex items-center gap-3">
+                                    <a
+                                        href={job.jobUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                        View Original Job Posting
+                                    </a>
+                                    <span className="text-sm text-gray-500">
+                                        Opens in new tab
+                                    </span>
+                                </div>
+                            )}
                         </div>
 
                     {/* Version Toggle */}

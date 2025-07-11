@@ -68,18 +68,31 @@ export const saveResumeData = async (userId: string, resumeData: ResumeData, res
 
 
 export const getUserGeneratedResumes = async (userId: string, jobId: string): Promise<JobData | null> => {
-  const job = doc(db, 'users', userId, 'jobs', jobId);
-  const jobDoc = await getDoc(job);
-  if (!jobDoc.exists()) {
-    return null;
+  if (!userId || !jobId) {
+    console.error('Invalid userId or jobId provided:', { userId, jobId });
+    throw new Error('Invalid userId or jobId provided');
   }
 
-  const jobData = jobDoc.data();
-  if (!jobData) {
-    return null;
-  }
+  try {
+    const jobRef = doc(db, 'users', userId, 'jobs', jobId);
+    const jobDoc = await getDoc(jobRef);
+    
+    if (!jobDoc.exists()) {
+      console.log(`Job document ${jobId} not found for user ${userId}`);
+      return null;
+    }
 
-  return jobData as JobData;
+    const jobData = jobDoc.data();
+    if (!jobData) {
+      console.log(`Job document ${jobId} exists but has no data for user ${userId}`);
+      return null;
+    }
+
+    return jobData as JobData;
+  } catch (error) {
+    console.error('Error fetching job data:', error);
+    throw error;
+  }
 }
 
 // Get a single resume by ID
