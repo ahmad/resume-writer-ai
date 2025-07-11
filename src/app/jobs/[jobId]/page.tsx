@@ -2,6 +2,7 @@
 
 import { getUserGeneratedResumes, JobData, updateAIResume } from "@/lib/firestore";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AppLayout } from "@/components/layout/AppLayout";
 import { use, useEffect, useState } from "react";
 import Loading from "@/components/Loading";
 import { ResumeData } from "@/types";
@@ -88,29 +89,23 @@ export default function GeneratePage({ params }: { params: Promise<{ jobId: stri
             
     return (
         <ProtectedRoute>
-            <div className="min-h-screen bg-gray-50 py-8">
-                <div className="max-w-6xl mx-auto px-4">
-                    {/* Header */}
-                    <div className="mb-8">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                    Resume for Job Application
-                                </h1>
-                                <p className="text-gray-600">
-                                    {job.selectedResume.resumeName}
-                                </p>
-                            </div>
-                            <div className="flex space-x-3">
-                                <a
-                                    href="/builder"
-                                    className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
-                                >
-                                    ← Back to Builder
-                                </a>
-                            </div>
+            <AppLayout 
+                showBackButton={true} 
+                backButtonHref="/builder" 
+                backButtonText="← Back to Builder"
+                pageTitle={job.selectedResume.resumeName}
+            >
+                <div className="py-8">
+                    <div className="max-w-6xl mx-auto px-4">
+                        {/* Page Header */}
+                        <div className="mb-8">
+                            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                                Resume for Job Application
+                            </h1>
+                            <p className="text-gray-600">
+                                {job.selectedResume.resumeName}
+                            </p>
                         </div>
-                    </div>
 
                     {/* Version Toggle */}
                     {hasAiVersion && (
@@ -229,6 +224,7 @@ export default function GeneratePage({ params }: { params: Promise<{ jobId: stri
                     )}
                 </div>
             </div>
+            </AppLayout>
         </ProtectedRoute>
     )
 }
