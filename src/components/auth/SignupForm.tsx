@@ -5,10 +5,9 @@ import { signUp } from '@/lib/auth';
 
 interface SignupFormProps {
   onSuccess?: () => void;
-  onSwitchToLogin?: () => void;
 }
 
-export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLogin }) => {
+export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -124,18 +123,6 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess, onSwitchToLog
         >
           {loading ? 'Creating account...' : 'Sign Up'}
         </button>
-
-        {onSwitchToLogin && (
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={onSwitchToLogin}
-              className="text-blue-600 hover:text-blue-500 text-sm"
-            >
-              Already have an account? Sign in
-            </button>
-          </div>
-        )}
       </form>
     </div>
   );

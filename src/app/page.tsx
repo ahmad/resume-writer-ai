@@ -1,12 +1,10 @@
-"use client";
+
 import Link from "next/link";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { AppLayout } from "@/components/layout/AppLayout";
+import { PublicLayout } from "@/components/layout/PublicLayout";
 
 export default function Home() {
   return (
-    <ProtectedRoute>
-      <AppLayout>
+      <PublicLayout>
         {/* Landing Page Content */}
         <div className="flex justify-center items-center min-h-[calc(100vh-80px)] px-4 py-8">
           <div className="text-center max-w-2xl">
@@ -26,7 +24,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </AppLayout>
-    </ProtectedRoute>
+      </PublicLayout>
   );
 }
