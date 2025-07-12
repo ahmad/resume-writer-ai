@@ -2,6 +2,228 @@
 
 import React, { useState } from 'react';
 import { ResumeData, Experience, Education, Project } from '../../types';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+// Sortable Skill Category Component
+interface SortableSkillCategoryProps {
+  id: string;
+  category: string;
+  skills: string[];
+  onUpdateCategory: (oldCategory: string, newCategory: string) => void;
+  onUpdateSkills: (category: string, skills: string[]) => void;
+  onRemoveCategory: (category: string) => void;
+  onRemoveSkill: (category: string, skillIndex: number) => void;
+  onAddSkill: (category: string) => void;
+}
+
+function SortableSkillCategory({
+  id,
+  category,
+  skills,
+  onUpdateCategory,
+  onUpdateSkills,
+  onRemoveCategory,
+  onRemoveSkill,
+  onAddSkill,
+}: SortableSkillCategoryProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`border border-gray-200 rounded-lg p-4 bg-white ${isDragging ? 'shadow-lg ring-2 ring-blue-500' : ''}`}
+    >
+      <div className="flex justify-between items-center mb-3">
+        <div className="flex items-center space-x-2">
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 select-none"
+          >
+            ⋮⋮
+          </div>
+          <input
+            type="text"
+            value={category}
+            onChange={(e) => onUpdateCategory(category, e.target.value)}
+            className="text-lg font-medium border-none bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 text-black"
+          />
+        </div>
+        <button
+          onClick={() => onRemoveCategory(category)}
+          className="text-red-600 hover:text-red-800"
+        >
+          Remove
+        </button>
+      </div>
+      <SortableSkillsList
+        category={category}
+        skills={skills}
+        onUpdateSkills={onUpdateSkills}
+        onRemoveSkill={onRemoveSkill}
+        onAddSkill={onAddSkill}
+      />
+    </div>
+  );
+}
+
+// Sortable Skills List Component
+interface SortableSkillsListProps {
+  category: string;
+  skills: string[];
+  onUpdateSkills: (category: string, skills: string[]) => void;
+  onRemoveSkill: (category: string, skillIndex: number) => void;
+  onAddSkill: (category: string) => void;
+}
+
+function SortableSkillsList({
+  category,
+  skills,
+  onUpdateSkills,
+  onRemoveSkill,
+  onAddSkill,
+}: SortableSkillsListProps) {
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      const oldIndex = skills.findIndex((_, index) => `skill-${category}-${index}` === active.id);
+      const newIndex = skills.findIndex((_, index) => `skill-${category}-${index}` === over?.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newSkills = arrayMove(skills, oldIndex, newIndex);
+        onUpdateSkills(category, newSkills);
+      }
+    }
+  };
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext
+        items={skills.map((_, index) => `skill-${category}-${index}`)}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="space-y-2">
+          {skills.map((skill, index) => (
+            <SortableSkillItem
+              key={`skill-${category}-${index}`}
+              id={`skill-${category}-${index}`}
+              skill={skill}
+              onUpdate={(value) => {
+                const newSkills = [...skills];
+                newSkills[index] = value;
+                onUpdateSkills(category, newSkills);
+              }}
+              onRemove={() => onRemoveSkill(category, index)}
+            />
+          ))}
+          <button
+            onClick={() => onAddSkill(category)}
+            className="text-blue-600 hover:text-blue-800 text-sm"
+          >
+            + Add Skill
+          </button>
+        </div>
+      </SortableContext>
+    </DndContext>
+  );
+}
+
+// Sortable Skill Item Component
+interface SortableSkillItemProps {
+  id: string;
+  skill: string;
+  onUpdate: (value: string) => void;
+  onRemove: () => void;
+}
+
+function SortableSkillItem({ id, skill, onUpdate, onRemove }: SortableSkillItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center space-x-2 ${isDragging ? 'bg-blue-50 rounded-md p-1' : ''}`}
+    >
+      <div
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 select-none"
+      >
+        ⋮⋮
+      </div>
+      <input
+        type="text"
+        value={skill}
+        onChange={(e) => onUpdate(e.target.value)}
+        className="flex-1 border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-black"
+      />
+      <button
+        onClick={onRemove}
+        className="text-red-600 hover:text-red-800"
+      >
+        ×
+      </button>
+    </div>
+  );
+}
 
 interface ResumeFormProps {
   data: ResumeData;
@@ -28,11 +250,56 @@ export default function ResumeForm({ data, onChange }: ResumeFormProps) {
     }
   };
 
+  const addSkillToCategory = (category: string) => {
+    const newSkills = { ...data.skills };
+    newSkills[category] = [...newSkills[category], ''];
+    onChange({ skills: newSkills });
+  };
+
+  const updateSkillCategory = (oldCategory: string, newCategory: string) => {
+    const newSkills = { ...data.skills };
+    delete newSkills[oldCategory];
+    newSkills[newCategory] = data.skills[oldCategory];
+    onChange({ skills: newSkills });
+  };
+
   const removeSkillCategory = (category: string) => {
     const newSkills = { ...data.skills };
     delete newSkills[category];
     onChange({ skills: newSkills });
   };
+
+  const removeSkillFromCategory = (category: string, skillIndex: number) => {
+    const newSkills = { ...data.skills };
+    newSkills[category] = newSkills[category].filter((_, i) => i !== skillIndex);
+    onChange({ skills: newSkills });
+  };
+
+  const handleCategoryDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      const categories = Object.keys(data.skills);
+      const oldIndex = categories.indexOf(active.id as string);
+      const newIndex = categories.indexOf(over?.id as string);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newCategories = arrayMove(categories, oldIndex, newIndex);
+        const newSkills: Record<string, string[]> = {};
+        newCategories.forEach(category => {
+          newSkills[category] = data.skills[category];
+        });
+        onChange({ skills: newSkills });
+      }
+    }
+  };
+
+  const categorySensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const updateExperience = (index: number, experience: Experience) => {
     const newExperience = [...data.experience];
@@ -251,7 +518,12 @@ export default function ResumeForm({ data, onChange }: ResumeFormProps) {
         {activeSection === 'skills' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-medium text-gray-900">Skills</h3>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Skills</h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Drag the ⋮⋮ handle to reorder categories and skills
+                </p>
+              </div>
               <button
                 onClick={addSkillCategory}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -260,62 +532,36 @@ export default function ResumeForm({ data, onChange }: ResumeFormProps) {
               </button>
             </div>
 
-            {Object.entries(data.skills).map(([category, skills]) => (
-              <div key={category} className="border border-gray-200 rounded-lg p-4">
-                <div className="flex justify-between items-center mb-3">
-                  <input
-                    type="text"
-                    value={category}
-                    onChange={(e) => {
-                      const newSkills = { ...data.skills };
-                      delete newSkills[category];
-                      newSkills[e.target.value] = skills;
-                      onChange({ skills: newSkills });
-                    }}
-                    className="text-lg font-medium border-none bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 text-black"
-                  />
-                  <button
-                    onClick={() => removeSkillCategory(category)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    Remove
-                  </button>
-                </div>
+            <DndContext
+              sensors={categorySensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleCategoryDragEnd}
+            >
+              <SortableContext
+                items={Object.keys(data.skills)}
+                strategy={verticalListSortingStrategy}
+              >
                 <div className="space-y-2">
-                  {skills.map((skill, index) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <input
-                        type="text"
-                        value={skill}
-                        onChange={(e) => {
-                          const newSkills = [...skills];
-                          newSkills[index] = e.target.value;
-                          updateSkills(category, newSkills);
-                        }}
-                        className="flex-1 border border-gray-300 rounded-md px-3 py-1 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-black"
-                      />
-                      <button
-                        onClick={() => {
-                          const newSkills = skills.filter((_, i) => i !== index);
-                          updateSkills(category, newSkills);
-                        }}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        ×
-                      </button>
-                    </div>
+                  {Object.entries(data.skills).map(([category, skills]) => (
+                    <SortableSkillCategory
+                      key={category}
+                      id={category}
+                      category={category}
+                      skills={skills}
+                      onUpdateCategory={updateSkillCategory}
+                      onUpdateSkills={(category, newSkills) => {
+                        updateSkills(category, newSkills);
+                      }}
+                      onRemoveCategory={removeSkillCategory}
+                      onRemoveSkill={(category, skillIndex) => {
+                        removeSkillFromCategory(category, skillIndex);
+                      }}
+                      onAddSkill={addSkillToCategory}
+                    />
                   ))}
-                  <button
-                    onClick={() => {
-                      updateSkills(category, [...skills, '']);
-                    }}
-                    className="text-blue-600 hover:text-blue-800 text-sm"
-                  >
-                    + Add Skill
-                  </button>
                 </div>
-              </div>
-            ))}
+              </SortableContext>
+            </DndContext>
           </div>
         )}
 
