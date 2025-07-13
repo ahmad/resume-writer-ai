@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Resume Writer AI
+
+A modern web application that helps users create professional resumes and cover letters using AI assistance. Built with Next.js and powered by Google's Generative AI.
+
+## Features
+
+- **AI-Powered Resume Generation**: Automatically generate professional resumes based on user input
+- **Cover Letter Creation**: AI-assisted cover letter writing tailored to specific job applications
+- **Multiple Resume Templates**: Choose from various resume templates and layouts
+- **Drag-and-Drop Builder**: Advanced resume builder with intuitive drag-and-drop interface
+- **PDF Export**: Export your resumes and cover letters in professional PDF format
+- **User Authentication**: Secure user accounts with Firebase authentication
+- **Cloud Storage**: Save and manage multiple resumes using Firebase Cloud Storage
+- **Real-time Preview**: See changes to your resume in real-time as you edit
+- **Job-Specific Recommendations**: Get AI-powered recommendations for job applications
+
+## Technology Stack
+
+- **Frontend Framework**: Next.js 15.3 with React 19
+- **Authentication & Database**: Firebase
+- **AI Integration**: Google Generative AI
+- **Styling**: TailwindCSS
+- **PDF Generation**: jsPDF and Puppeteer
+- **Drag and Drop**: dnd-kit
+- **Type Safety**: TypeScript
+- **Development Tools**: ESLint, TurboRepo
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js (Latest LTS version recommended)
+- npm or yarn package manager
+- Firebase account and project setup
+- Google AI API key
+
+### Environment Setup
+
+1. Clone the repository
+2. Create a `.env.local` file in the root directory with the following variables:
+   ```
+   FIREBASE_API_KEY=your_firebase_api_key
+   FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+   FIREBASE_PROJECT_ID=your_firebase_project_id
+   FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+   FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+   FIREBASE_APP_ID=your_app_id
+   GOOGLE_AI_API_KEY=your_google_ai_api_key
+   ```
+
+### Installation
 
 ```bash
+# Install dependencies
+npm install
+# or
+yarn install
+
+# Run the development server
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The application will be available at [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/src/app` - Next.js application routes and API endpoints
+- `/src/components` - Reusable React components
+- `/src/contexts` - React context providers
+- `/src/hooks` - Custom React hooks
+- `/src/lib` - Core functionality and service integrations
+- `/src/utils` - Utility functions and helpers
+- `/src/types` - TypeScript type definitions
 
-## Learn More
+## Building for Production
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Create production build
+npm run build
+# or
+yarn build
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Start production server
+npm run start
+# or
+yarn start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributing
 
-## Deploy on Vercel
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is proprietary software. All rights reserved.
