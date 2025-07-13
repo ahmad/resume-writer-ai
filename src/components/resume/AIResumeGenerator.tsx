@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Resume } from './AdvancedResumeBuilder';
+import { Button } from '@/components/common/Button';
 
 interface AIResumeGeneratorProps {
   resumes: Array<Resume>;
@@ -150,28 +151,23 @@ export default function AIResumeGenerator({
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
               disabled={isGenerating}
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
+              variant="success"
               disabled={isGenerating || !jobDescription.trim() || !selectedResume}
-              className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+              loading={isGenerating}
+              loadingText="Generating..."
             >
-              {isGenerating ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>Generating...</span>
-                </>
-              ) : (
-                <span>Generate AI Resume</span>
-              )}
-            </button>
+              Generate AI Resume
+            </Button>
           </div>
         </form>
       </div>

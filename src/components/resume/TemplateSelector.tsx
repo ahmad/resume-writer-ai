@@ -9,11 +9,11 @@ interface TemplateSelectorProps {
   className?: string;
 }
 
-export default function TemplateSelector({ 
+const TemplateSelector: React.FC<TemplateSelectorProps> = React.memo(({ 
   selectedTemplate, 
   onTemplateChange, 
   className = '' 
-}: TemplateSelectorProps) {
+}) => {
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
       <label className="text-sm font-medium text-gray-700">Resume Template:</label>
@@ -34,4 +34,8 @@ export default function TemplateSelector({
       </div>
     </div>
   );
-} 
+});
+
+TemplateSelector.displayName = 'TemplateSelector';
+
+export default TemplateSelector; 

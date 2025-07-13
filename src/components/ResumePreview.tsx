@@ -7,14 +7,17 @@ import type { ResumeTemplate } from "../html-pdf-generator";
 import TemplateSelector from "./resume/TemplateSelector";
 import { downloadPDF, generateResumeFilename } from "@/utils/pdf";
 import { LoadingOverlay } from "./common/LoadingOverlay";
+import { Button } from "./common/Button";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { useResumeOperations } from "@/hooks/useResumeOperations";
+import { useUIState } from "@/contexts/UIStateContext";
 
 export default function ResumePreview({ data, isLoading }: { data: ResumeData; isLoading: boolean }) {
   const { user } = useAuth();
   const [selectedTemplate, setSelectedTemplate] = useState<ResumeTemplate>('modern');
   const { saveResume, isSaving } = useResumeOperations();
   const { error, handleError, clearError } = useErrorHandler();
+  const { showNotification } = useUIState();
 
   if (Object.keys(data).length === 0) {
     return <div>No data</div>;
@@ -43,7 +46,11 @@ export default function ResumePreview({ data, isLoading }: { data: ResumeData; i
     try {
       clearError();
       await saveResume(data);
-      alert('Resume saved successfully!');
+      showNotification({
+        type: 'success',
+        title: 'Success',
+        message: 'Resume saved successfully!'
+      });
     } catch (error) {
       // Error is already handled by the hook
     }
@@ -62,20 +69,22 @@ export default function ResumePreview({ data, isLoading }: { data: ResumeData; i
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">{data.name}</h2>
         <div className="flex gap-2">
-          <button 
+          <Button 
+            variant="success"
             onClick={handleSave} 
             disabled={isSaving || !user}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            loading={isSaving}
+            loadingText="Saving..."
           >
-            {isSaving ? 'Saving...' : 'Save'}
-          </button>
-          <button
+            Save
+          </Button>
+          <Button
+            variant="success"
             onClick={handleDownload}
             disabled={isLoading}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Download PDF
-          </button>
+          </Button>
         </div>
       </div>
 

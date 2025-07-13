@@ -7,7 +7,7 @@ interface LoadingSpinnerProps {
   color?: 'blue' | 'white' | 'green';
 }
 
-export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ 
+export const LoadingSpinner: React.FC<LoadingSpinnerProps> = React.memo(({ 
   size = 'md', 
   text, 
   className = '',
@@ -31,4 +31,6 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
       {text && <p className="text-gray-600 font-medium">{text}</p>}
     </div>
   );
-}; 
+});
+
+LoadingSpinner.displayName = 'LoadingSpinner'; 

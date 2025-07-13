@@ -11,6 +11,8 @@ import AIResumeGenerator from './AIResumeGenerator';
 import { useResumeOperations } from '@/hooks/useResumeOperations';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { Button } from '@/components/common/Button';
+import { useUIState } from '@/contexts/UIStateContext';
 
 
 
@@ -32,6 +34,7 @@ export default function AdvancedResumeBuilder() {
     error 
   } = useResumeOperations();
   const { clearError } = useErrorHandler();
+  const { showNotification } = useUIState();
   
   const getDefaultResumeData = (): ResumeData => ({
     changeSummary: '',
@@ -102,10 +105,18 @@ export default function AdvancedResumeBuilder() {
       const resumeId = await saveResume(resumeData, currentResumeId || undefined);
       setCurrentResumeId(resumeId);
       await loadUserResumesData(); // Refresh the list
-      alert('Resume saved successfully!');
+      showNotification({
+        type: 'success',
+        title: 'Success',
+        message: 'Resume saved successfully!'
+      });
     } catch (error) {
       console.error('Error saving resume:', error);
-      alert('Error saving resume. Please try again.');
+      showNotification({
+        type: 'error',
+        title: 'Error',
+        message: 'Error saving resume. Please try again.'
+      });
     }
   };
 
@@ -119,10 +130,18 @@ export default function AdvancedResumeBuilder() {
         setCurrentResumeId(null);
         setResumeData(getDefaultResumeData());
       }
-      alert('Resume deleted successfully!');
+      showNotification({
+        type: 'success',
+        title: 'Success',
+        message: 'Resume deleted successfully!'
+      });
     } catch (error) {
       console.error('Error deleting resume:', error);
-      alert('Error deleting resume. Please try again.');
+      showNotification({
+        type: 'error',
+        title: 'Error',
+        message: 'Error deleting resume. Please try again.'
+      });
     }
   };
 
@@ -132,10 +151,18 @@ export default function AdvancedResumeBuilder() {
     try {
       await duplicateResumeById(resumeId);
       await loadUserResumesData(); // Refresh the list
-      alert('Resume duplicated successfully!');
+      showNotification({
+        type: 'success',
+        title: 'Success',
+        message: 'Resume duplicated successfully!'
+      });
     } catch (error) {
       console.error('Error duplicating resume:', error);
-      alert('Error duplicating resume. Please try again.');
+      showNotification({
+        type: 'error',
+        title: 'Error',
+        message: 'Error duplicating resume. Please try again.'
+      });
     }
   };
 
@@ -187,36 +214,27 @@ export default function AdvancedResumeBuilder() {
           <div className="flex justify-between items-center py-4">
             <h1 className="text-2xl font-bold text-gray-900">Advanced Resume Builder</h1>
             <div className="flex space-x-3">
-              <button
+              <Button
+                variant={viewMode === 'list' ? 'primary' : 'secondary'}
                 onClick={() => setViewMode('list')}
-                className={`px-4 py-2 rounded-md text-sm font-medium ${
-                  viewMode === 'list' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
+                size="sm"
               >
                 My Resumes
-              </button>
-              <button
+              </Button>
+              <Button
+                variant={viewMode === 'form' ? 'primary' : 'secondary'}
                 onClick={() => setViewMode('form')}
-                className={`px-4 py-2 rounded-md text-sm font-medium ${
-                  viewMode === 'form' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
+                size="sm"
               >
                 Editor
-              </button>
-              <button
+              </Button>
+              <Button
+                variant={viewMode === 'preview' ? 'primary' : 'secondary'}
                 onClick={() => setViewMode('preview')}
-                className={`px-4 py-2 rounded-md text-sm font-medium ${
-                  viewMode === 'preview' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
+                size="sm"
               >
                 Preview
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -254,14 +272,15 @@ export default function AdvancedResumeBuilder() {
                     {currentResumeId ? 'Edit Resume' : 'Create New Resume'}
                   </h2>
                   <div className="flex space-x-3">
-                    <button
+                    <Button
+                      variant="success"
                       onClick={handleSaveResume}
                       disabled={isSaving}
-                      className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      loading={isSaving}
+                      loadingText="Saving..."
                     >
-                      {isSaving && <LoadingSpinner size="sm" color="white" />}
-                      {isSaving ? 'Saving...' : 'Save Resume'}
-                    </button>
+                      Save Resume
+                    </Button>
                   </div>
                 </div>
                 <ResumeForm
@@ -275,12 +294,13 @@ export default function AdvancedResumeBuilder() {
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-semibold text-gray-900">Resume Preview</h2>
-                  <button
+                  <Button
+                    variant="primary"
                     onClick={() => setViewMode('form')}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    size="sm"
                   >
                     Back to Editor
-                  </button>
+                  </Button>
                 </div>
                 <ResumePreview data={resumeData} isLoading={isLoading} />
               </div>

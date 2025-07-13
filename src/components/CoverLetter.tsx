@@ -1,6 +1,7 @@
 import { CoverLetter, ResumeData } from "@/types";
 import { downloadPDF, generateCoverLetterFilename } from "@/utils/pdf";
 import { LoadingOverlay } from "./common/LoadingOverlay";
+import { Button } from "./common/Button";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 export default function CoverLetterPreview({ data, resumeData, isLoading }: { data: CoverLetter; resumeData: ResumeData; isLoading: boolean }) {
@@ -28,13 +29,13 @@ export default function CoverLetterPreview({ data, resumeData, isLoading }: { da
         
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Cover Letter</h2>
-          <button
+          <Button
+            variant="success"
             onClick={handleDownload}
             disabled={isLoading}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Download PDF
-          </button>
+          </Button>
         </div>
   
                 <div className="space-y-4">

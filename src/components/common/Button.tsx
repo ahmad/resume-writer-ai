@@ -9,7 +9,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
 }
 
-export const Button: React.FC<ButtonProps> = ({
+export const Button: React.FC<ButtonProps> = React.memo(({
   variant = 'primary',
   size = 'md',
   loading = false,
@@ -46,4 +46,6 @@ export const Button: React.FC<ButtonProps> = ({
       {loading && loadingText ? loadingText : children}
     </button>
   );
-}; 
+});
+
+Button.displayName = 'Button'; 

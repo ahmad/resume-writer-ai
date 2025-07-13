@@ -7,7 +7,7 @@ interface LoadingOverlayProps {
   className?: string;
 }
 
-export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ 
+export const LoadingOverlay: React.FC<LoadingOverlayProps> = React.memo(({ 
   isLoading, 
   text = 'Loading...',
   className = ''
@@ -19,4 +19,6 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
       <LoadingSpinner size="lg" text={text} />
     </div>
   );
-}; 
+});
+
+LoadingOverlay.displayName = 'LoadingOverlay'; 
