@@ -4,10 +4,13 @@ import { useState } from 'react';
 import { saveResumeData } from "@/lib/firestore";
 import { ResumeData } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
+import type { ResumeTemplate } from "../html-pdf-generator";
+import TemplateSelector from "./resume/TemplateSelector";
 
 export default function ResumePreview({ data, isLoading }: { data: ResumeData; isLoading: boolean }) {
   const { user } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<ResumeTemplate>('modern');
 
   if (Object.keys(data).length === 0) {
     return <div>No data</div>;
@@ -21,7 +24,11 @@ export default function ResumePreview({ data, isLoading }: { data: ResumeData; i
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ type: 'resume', data }),
+        body: JSON.stringify({ 
+          type: 'resume', 
+          data,
+          template: selectedTemplate 
+        }),
       });
       
       if (!response.ok) {
@@ -32,7 +39,7 @@ export default function ResumePreview({ data, isLoading }: { data: ResumeData; i
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${data.resumeName.replace(/\s+/g, '_') || data.name.replace(/\s+/g, '_')}_resume.pdf`;
+      a.download = `${data.resumeName.replace(/\s+/g, '_') || data.name.replace(/\s+/g, '_')}_resume_${selectedTemplate}.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -92,6 +99,16 @@ export default function ResumePreview({ data, isLoading }: { data: ResumeData; i
           </button>
         </div>
       </div>
+
+      {/* Template Selection */}
+      <div className="mb-4">
+        <TemplateSelector
+          selectedTemplate={selectedTemplate}
+          onTemplateChange={setSelectedTemplate}
+          className="max-w-xs"
+        />
+      </div>
+
       <div className="text-blue-700 font-semibold mb-2">{data.title}</div>
       <div className="mb-2 text-xs text-gray-500">{data.location} | {data.email} | {data.phone}</div>
       <div className="mb-4 text-xs text-gray-500">

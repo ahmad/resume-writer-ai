@@ -17,6 +17,7 @@ export interface ResumeData {
   education: Education[];
   projects: Project[];
   generated?: boolean;
+  template?: 'modern' | 'ats-friendly';
 }
 
 

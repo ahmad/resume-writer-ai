@@ -1,14 +1,268 @@
 import puppeteer from 'puppeteer';
 import type { ResumeData, CoverLetter } from './types';
 
+export type ResumeTemplate = 'modern' | 'ats-friendly';
+
 export class HTMLPDFGenerator {
   private data: ResumeData;
+  private template: ResumeTemplate;
 
-  constructor(data: ResumeData) {
+  constructor(data: ResumeData, template: ResumeTemplate = 'modern') {
     this.data = data;
+    this.template = template;
   }
 
   private generateHTML(): string {
+    if (this.template === 'ats-friendly') {
+      return this.generateATSFriendlyHTML();
+    }
+    return this.generateModernHTML();
+  }
+
+  private generateATSFriendlyHTML(): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>${this.data.name} - Resume</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Times+New+Roman:wght@400;700&display=swap');
+            
+            body {
+              font-family: 'Times New Roman', Times, serif;
+              margin: 0;
+              padding: 20px;
+              background-color: white;
+              color: #000000;
+              font-size: 12px;
+              line-height: 1.4;
+            }
+            
+            .resume-container {
+              background-color: white;
+              padding: 20px;
+              max-width: 800px;
+              margin: 0 auto;
+            }
+            
+            .header-section {
+              text-align: center;
+              margin-bottom: 20px;
+              border-bottom: 2px solid #000000;
+              padding-bottom: 15px;
+            }
+            
+            .name {
+              font-size: 24px;
+              font-weight: 700;
+              color: #000000;
+              margin-bottom: 5px;
+              text-transform: uppercase;
+            }
+            
+            .title {
+              font-size: 16px;
+              font-weight: 400;
+              color: #000000;
+              margin-bottom: 10px;
+            }
+            
+            .contact-info {
+              font-size: 12px;
+              color: #000000;
+              margin-bottom: 5px;
+            }
+            
+            .section {
+              margin-bottom: 15px;
+            }
+            
+            .section-title {
+              font-size: 14px;
+              font-weight: 700;
+              color: #000000;
+              margin-bottom: 8px;
+              text-transform: uppercase;
+              border-bottom: 1px solid #000000;
+              padding-bottom: 2px;
+            }
+            
+            .summary {
+              color: #000000;
+              margin-bottom: 15px;
+              font-size: 12px;
+              text-align: justify;
+            }
+            
+            .skills-section {
+              margin-bottom: 15px;
+            }
+            
+            .skill-category {
+              margin-bottom: 8px;
+            }
+            
+            .skill-category-name {
+              font-weight: 700;
+              font-size: 12px;
+              margin-bottom: 3px;
+            }
+            
+            .skill-list {
+              font-size: 12px;
+              color: #000000;
+            }
+            
+            .experience-item {
+              margin-bottom: 12px;
+            }
+            
+            .job-header {
+              font-weight: 700;
+              font-size: 12px;
+              margin-bottom: 2px;
+            }
+            
+            .job-meta {
+              font-size: 12px;
+              color: #000000;
+              margin-bottom: 5px;
+              font-style: italic;
+            }
+            
+            .job-bullets {
+              margin-left: 20px;
+              list-style-type: disc;
+            }
+            
+            .job-bullet {
+              font-size: 12px;
+              color: #000000;
+              margin-bottom: 2px;
+            }
+            
+            .project-item {
+              margin-bottom: 8px;
+            }
+            
+            .project-title {
+              font-weight: 700;
+              font-size: 12px;
+              margin-bottom: 2px;
+            }
+            
+            .project-description {
+              font-size: 12px;
+              color: #000000;
+              margin-left: 20px;
+            }
+            
+            .education-item {
+              margin-bottom: 8px;
+            }
+            
+            .degree {
+              font-weight: 700;
+              font-size: 12px;
+              margin-bottom: 2px;
+            }
+            
+            .school-info {
+              font-size: 12px;
+              color: #000000;
+              font-style: italic;
+            }
+            
+            @media print {
+              body {
+                background-color: white;
+                padding: 0;
+              }
+              
+              .resume-container {
+                padding: 15px;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="resume-container">
+            <div class="header-section">
+              <div class="name">${this.data.name}</div>
+              <div class="title">${this.data.title}</div>
+              <div class="contact-info">${this.data.location} | ${this.data.email} | ${this.data.phone}</div>
+              ${this.data.linkedin ? `<div class="contact-info">LinkedIn: ${this.data.linkedin}</div>` : ''}
+              ${this.data.github ? `<div class="contact-info">GitHub: ${this.data.github}</div>` : ''}
+              ${this.data.website ? `<div class="contact-info">Website: ${this.data.website}</div>` : ''}
+            </div>
+            
+            ${this.data.summary ? `
+            <div class="section">
+              <div class="section-title">Professional Summary</div>
+              <div class="summary">${this.data.summary}</div>
+            </div>
+            ` : ''}
+            
+            ${Object.keys(this.data.skills).length > 0 ? `
+            <div class="section">
+              <div class="section-title">Skills</div>
+              ${Object.keys(this.data.skills).map(key => `
+                <div class="skill-category">
+                  <div class="skill-category-name">${key}:</div>
+                  <div class="skill-list">${this.data.skills[key].filter(skill => skill.trim()).join(', ')}</div>
+                </div>
+              `).join('')}
+            </div>
+            ` : ''}
+            
+            ${this.data.experience.length > 0 ? `
+            <div class="section">
+              <div class="section-title">Professional Experience</div>
+              ${this.data.experience.map(exp => `
+                <div class="experience-item">
+                  <div class="job-header">${exp.title}</div>
+                  <div class="job-meta">${exp.company} | ${exp.period} | ${exp.location}</div>
+                  ${exp.bullets.filter(bullet => bullet.trim()).length > 0 ? `
+                    <ul class="job-bullets">
+                      ${exp.bullets.filter(bullet => bullet.trim()).map(bullet => `<li class="job-bullet">${bullet}</li>`).join('')}
+                    </ul>
+                  ` : ''}
+                </div>
+              `).join('')}
+            </div>
+            ` : ''}
+            
+            ${this.data.projects.length > 0 ? `
+            <div class="section">
+              <div class="section-title">Projects</div>
+              ${this.data.projects.map(project => `
+                <div class="project-item">
+                  <div class="project-title">${project.title}</div>
+                  <div class="project-description">${project.description}</div>
+                </div>
+              `).join('')}
+            </div>
+            ` : ''}
+            
+            ${this.data.education.length > 0 ? `
+            <div class="section">
+              <div class="section-title">Education</div>
+              ${this.data.education.map(edu => `
+                <div class="education-item">
+                  <div class="degree">${edu.degree}</div>
+                  <div class="school-info">${edu.school} | ${edu.year} | ${edu.location}</div>
+                </div>
+              `).join('')}
+            </div>
+            ` : ''}
+          </div>
+        </body>
+      </html>
+    `;
+  }
+
+  private generateModernHTML(): string {
     return `
       <!DOCTYPE html>
       <html>

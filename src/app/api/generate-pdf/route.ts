@@ -7,16 +7,16 @@ import type { ResumeData, CoverLetter } from '../../../types';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { type, data } = body;
+    const { type, data, template = 'modern' } = body;
     
     let buffer: Buffer;
     let filename: string;
     
     if (type === 'resume') {
       const resumeData = data as ResumeData;
-      const generator = new HTMLPDFGenerator(resumeData);
+      const generator = new HTMLPDFGenerator(resumeData, template);
       buffer = await generator.generate();
-      filename = `${resumeData.resumeName.replace(/\s+/g, '_') || resumeData.name.replace(/\s+/g, '_')}_resume.pdf`;
+      filename = `${resumeData.resumeName.replace(/\s+/g, '_') || resumeData.name.replace(/\s+/g, '_')}_resume_${template}.pdf`;
     } else if (type === 'cover-letter') {
       const coverLetterData = data as CoverLetter;
       // For cover letter, we need resume data for the signature

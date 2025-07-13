@@ -1,7 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ResumeData } from '../../types';
+import type { ResumeTemplate } from '../../html-pdf-generator';
+import TemplateSelector from './TemplateSelector';
 
 interface ResumePreviewProps {
   data: ResumeData;
@@ -9,6 +11,8 @@ interface ResumePreviewProps {
 }
 
 export default function ResumePreview({ data }: ResumePreviewProps) {
+  const [selectedTemplate, setSelectedTemplate] = useState<ResumeTemplate>('modern');
+
   if (Object.keys(data).length === 0) {
     return <div>No data</div>;
   }
@@ -21,7 +25,11 @@ export default function ResumePreview({ data }: ResumePreviewProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ type: 'resume', data }),
+        body: JSON.stringify({ 
+          type: 'resume', 
+          data,
+          template: selectedTemplate 
+        }),
       });
       
       if (!response.ok) {
@@ -32,7 +40,7 @@ export default function ResumePreview({ data }: ResumePreviewProps) {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${data.resumeName.replace(/\s+/g, '_') || data.name.replace(/\s+/g, '_')}_resume.pdf`;
+      a.download = `${data.resumeName.replace(/\s+/g, '_') || data.name.replace(/\s+/g, '_')}_resume_${selectedTemplate}.pdf`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -45,19 +53,26 @@ export default function ResumePreview({ data }: ResumePreviewProps) {
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
-      {/* Header with Download Button */}
+      {/* Header with Template Selection and Download Button */}
       <div className="border-b-2 border-gray-300 pb-4 mb-6">
         <div className="flex justify-between items-start mb-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">{data.name}</h1>
             <p className="text-xl text-gray-700 mb-3">{data.title}</p>
           </div>
-          <button
-            onClick={handleDownload}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
-          >
-            Download PDF
-          </button>
+          <div className="flex flex-col gap-3">
+            {/* Template Selection */}
+            <TemplateSelector
+              selectedTemplate={selectedTemplate}
+              onTemplateChange={setSelectedTemplate}
+            />
+            <button
+              onClick={handleDownload}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
+            >
+              Download PDF
+            </button>
+          </div>
         </div>
         <div className="flex flex-wrap gap-4 text-sm text-gray-600">
           <span>{data.location}</span>
