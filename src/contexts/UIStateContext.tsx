@@ -14,7 +14,7 @@ interface Notification {
 interface ModalState {
   isOpen: boolean;
   type: string | null;
-  data?: any;
+  data?: unknown;
 }
 
 interface UIState {
@@ -34,7 +34,7 @@ type UIAction =
   | { type: 'ADD_NOTIFICATION'; payload: Notification }
   | { type: 'REMOVE_NOTIFICATION'; payload: string }
   | { type: 'CLEAR_ALL_NOTIFICATIONS' }
-  | { type: 'OPEN_MODAL'; payload: { type: string; data?: any } }
+  | { type: 'OPEN_MODAL'; payload: { type: string; data?: unknown } }
   | { type: 'CLOSE_MODAL' }
   | { type: 'TOGGLE_SIDEBAR' }
   | { type: 'SET_SIDEBAR_OPEN'; payload: boolean }
@@ -136,7 +136,7 @@ interface UIContextType {
   // Convenience methods
   showNotification: (notification: Omit<Notification, 'id'>) => void;
   hideNotification: (id: string) => void;
-  openModal: (type: string, data?: any) => void;
+  openModal: (type: string, data?: unknown) => void;
   closeModal: () => void;
   toggleSidebar: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
@@ -170,7 +170,7 @@ export const UIStateProvider: React.FC<UIStateProviderProps> = ({ children }) =>
     dispatch({ type: 'REMOVE_NOTIFICATION', payload: id });
   };
 
-  const openModal = (type: string, data?: any) => {
+  const openModal = (type: string, data?: unknown) => {
     dispatch({ type: 'OPEN_MODAL', payload: { type, data } });
   };
 

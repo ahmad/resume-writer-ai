@@ -51,7 +51,7 @@ export default function ResumePreview({ data, isLoading }: { data: ResumeData; i
         title: 'Success',
         message: 'Resume saved successfully!'
       });
-    } catch (error) {
+    } catch {
       // Error is already handled by the hook
     }
   };

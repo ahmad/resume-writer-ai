@@ -1,4 +1,4 @@
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;
@@ -8,13 +8,9 @@ export interface ResumeApiResponse extends ApiResponse<ResumeData> {
   changeSummary?: string;
 }
 
-export interface CoverLetterApiResponse extends ApiResponse<CoverLetter> {
-  // Add any cover letter specific fields here
-}
+export type CoverLetterApiResponse = ApiResponse<CoverLetter>;
 
-export interface JobApiResponse extends ApiResponse<JobData> {
-  // Add any job specific fields here
-}
+export type JobApiResponse = ApiResponse<JobData>;
 
 // Re-export types that might be needed
 export interface ResumeData {
@@ -81,6 +77,6 @@ export interface JobData {
   selectedResume: ResumeData;
   jobUrl?: string;
   status: 'pending' | 'processing' | 'completed' | 'failed';
-  createdAt: any;
-  updatedAt: any;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 } 

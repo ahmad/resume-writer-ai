@@ -1,6 +1,6 @@
 export interface PDFDownloadData {
   type: 'resume' | 'cover-letter';
-  data: any;
+  data: unknown;
   template?: string;
 }
 
