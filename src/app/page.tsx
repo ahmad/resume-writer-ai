@@ -84,7 +84,7 @@ export default function Home() {
               </div>
               <h3 className="text-xl font-medium text-gray-900 mb-4">Cover Letters</h3>
               <p className="text-gray-600 leading-relaxed">
-                Generate compelling cover letters tailored to your resume and the specific job you're applying for.
+                Generate compelling cover letters tailored to your resume and the specific job you&apos;re applying for.
               </p>
             </div>
 
@@ -219,7 +219,7 @@ export default function Home() {
                   </li>
                   <li className="flex gap-4">
                     <span className="w-6 h-6 bg-gray-900 text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">2</span>
-                    <span>Paste the job description and click "Generate AI Resume"</span>
+                    <span>Paste the job description and click &quot;Generate AI Resume&quot;</span>
                   </li>
                   <li className="flex gap-4">
                     <span className="w-6 h-6 bg-gray-900 text-white rounded-full flex items-center justify-center text-xs font-medium flex-shrink-0">3</span>
