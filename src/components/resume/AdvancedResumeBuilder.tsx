@@ -3,11 +3,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ResumeData } from '../../types';
-import { saveResumeData, getResumeData, getUserResumes, deleteResume, duplicateResume, saveJobData } from '../../lib/firestore';
+import { saveJobData } from '../../lib/firestore';
 import ResumeForm from './ResumeForm';
 import ResumePreview from './ResumePreview';
 import ResumeList from './ResumeList';
 import AIResumeGenerator from './AIResumeGenerator';
+import { useResumeOperations } from '@/hooks/useResumeOperations';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 
 
@@ -18,6 +21,17 @@ export interface Resume extends ResumeData {
 
 export default function AdvancedResumeBuilder() {
   const { user } = useAuth();
+  const { 
+    saveResume, 
+    loadResume, 
+    loadUserResumes, 
+    deleteResumeById, 
+    duplicateResumeById,
+    isLoading, 
+    isSaving,
+    error 
+  } = useResumeOperations();
+  const { clearError } = useErrorHandler();
   
   const getDefaultResumeData = (): ResumeData => ({
     changeSummary: '',
@@ -40,31 +54,26 @@ export default function AdvancedResumeBuilder() {
   const [resumeData, setResumeData] = useState<ResumeData>(getDefaultResumeData());
   const [currentResumeId, setCurrentResumeId] = useState<string | null>(null);
   const [userResumes, setUserResumes] = useState<Array<Resume>>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'form' | 'preview' | 'list'>('list');
-  const [isSaving, setIsSaving] = useState(false);
   const [showAIGenerator, setShowAIGenerator] = useState(false);
 
-  const loadUserResumes = useCallback(async () => {
+  const loadUserResumesData = useCallback(async () => {
     if (!user) return;
     
-    setIsLoading(true);
     try {
-      const resumes = await getUserResumes(user.uid);
+      const resumes = await loadUserResumes();
       setUserResumes(resumes);
     } catch (error) {
       console.error('Error loading resumes:', error);
-    } finally {
-      setIsLoading(false);
     }
-  }, [user]);
+  }, [user, loadUserResumes]);
 
   // Load user's resumes on component mount
   useEffect(() => {
     if (user) {
-      loadUserResumes();
+      loadUserResumesData();
     }
-  }, [user, loadUserResumes]);
+  }, [user, loadUserResumesData]);
 
   const handleCreateNew = () => {
     setResumeData(getDefaultResumeData());
@@ -73,9 +82,8 @@ export default function AdvancedResumeBuilder() {
   };
 
   const handleEditResume = async (resumeId: string) => {
-    setIsLoading(true);
     try {
-      const resume = await getResumeData(resumeId);
+      const resume = await loadResume(resumeId);
       if (resume) {
         setResumeData(resume);
         setCurrentResumeId(resumeId);
@@ -83,35 +91,30 @@ export default function AdvancedResumeBuilder() {
       }
     } catch (error) {
       console.error('Error loading resume:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleSaveResume = async () => {
     if (!user) return;
 
-    setIsSaving(true);
     try {
-      const resumeId = await saveResumeData(user.uid, resumeData, currentResumeId || undefined);
+      clearError();
+      const resumeId = await saveResume(resumeData, currentResumeId || undefined);
       setCurrentResumeId(resumeId);
-      await loadUserResumes(); // Refresh the list
+      await loadUserResumesData(); // Refresh the list
       alert('Resume saved successfully!');
     } catch (error) {
       console.error('Error saving resume:', error);
       alert('Error saving resume. Please try again.');
-    } finally {
-      setIsSaving(false);
     }
   };
 
   const handleDeleteResume = async (resumeId: string) => {
     if (!confirm('Are you sure you want to delete this resume?')) return;
 
-    setIsLoading(true);
     try {
-      await deleteResume(resumeId);
-      await loadUserResumes(); // Refresh the list
+      await deleteResumeById(resumeId);
+      await loadUserResumesData(); // Refresh the list
       if (currentResumeId === resumeId) {
         setCurrentResumeId(null);
         setResumeData(getDefaultResumeData());
@@ -120,24 +123,19 @@ export default function AdvancedResumeBuilder() {
     } catch (error) {
       console.error('Error deleting resume:', error);
       alert('Error deleting resume. Please try again.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleDuplicateResume = async (resumeId: string) => {
     if (!user) return;
 
-    setIsLoading(true);
     try {
-      await duplicateResume(user.uid, resumeId);
-      await loadUserResumes(); // Refresh the list
+      await duplicateResumeById(resumeId);
+      await loadUserResumesData(); // Refresh the list
       alert('Resume duplicated successfully!');
     } catch (error) {
       console.error('Error duplicating resume:', error);
       alert('Error duplicating resume. Please try again.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -226,9 +224,15 @@ export default function AdvancedResumeBuilder() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
+        
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <LoadingSpinner size="lg" />
           </div>
         ) : (
           <>
@@ -253,8 +257,9 @@ export default function AdvancedResumeBuilder() {
                     <button
                       onClick={handleSaveResume}
                       disabled={isSaving}
-                      className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
+                      {isSaving && <LoadingSpinner size="sm" color="white" />}
                       {isSaving ? 'Saving...' : 'Save Resume'}
                     </button>
                   </div>

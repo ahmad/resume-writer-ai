@@ -1,45 +1,28 @@
 import { CoverLetter, ResumeData } from "@/types";
+import { downloadPDF, generateCoverLetterFilename } from "@/utils/pdf";
+import { LoadingOverlay } from "./common/LoadingOverlay";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 export default function CoverLetterPreview({ data, resumeData, isLoading }: { data: CoverLetter; resumeData: ResumeData; isLoading: boolean }) {
+    const { error, handleError, clearError } = useErrorHandler();
+
     const handleDownload = async () => {
       try {
-        // Create a blob URL for the PDF
-        const response = await fetch('/api/generate-pdf', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ type: 'cover-letter', data }),
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to generate PDF');
-        }
-        
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${data.recipientName.replace(/\s+/g, '_')}_cover_letter.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        clearError();
+        const filename = generateCoverLetterFilename(data.recipientName);
+        await downloadPDF({ type: 'cover-letter', data }, filename);
       } catch (error) {
-        console.error('Error generating PDF:', error);
-        alert('Failed to generate PDF. Please try again.');
+        handleError(error, 'Failed to generate PDF. Please try again.');
       }
     };
   
     return (
       <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-4xl text-gray-900 text-sm relative">
-        {/* Loading Overlay */}
-        {isLoading && (
-          <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-xl z-10">
-            <div className="flex flex-col items-center gap-3">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-              <p className="text-gray-600 font-medium">Generating your cover letter...</p>
-            </div>
+        <LoadingOverlay isLoading={isLoading} text="Generating your cover letter..." />
+        
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
           </div>
         )}
         

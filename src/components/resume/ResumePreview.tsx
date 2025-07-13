@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { ResumeData } from '../../types';
 import type { ResumeTemplate } from '../../html-pdf-generator';
 import TemplateSelector from './TemplateSelector';
+import { downloadPDF, generateResumeFilename } from '@/utils/pdf';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 interface ResumePreviewProps {
   data: ResumeData;
@@ -12,6 +14,7 @@ interface ResumePreviewProps {
 
 export default function ResumePreview({ data }: ResumePreviewProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<ResumeTemplate>('modern');
+  const { error, handleError, clearError } = useErrorHandler();
 
   if (Object.keys(data).length === 0) {
     return <div>No data</div>;
@@ -19,40 +22,26 @@ export default function ResumePreview({ data }: ResumePreviewProps) {
 
   const handleDownload = async () => {
     try {
-      // Create a blob URL for the PDF
-      const response = await fetch('/api/generate-pdf', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          type: 'resume', 
-          data,
-          template: selectedTemplate 
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to generate PDF');
-      }
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${data.resumeName.replace(/\s+/g, '_') || data.name.replace(/\s+/g, '_')}_resume_${selectedTemplate}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      clearError();
+      const filename = generateResumeFilename(data.resumeName, data.name, selectedTemplate);
+      await downloadPDF({ 
+        type: 'resume', 
+        data,
+        template: selectedTemplate 
+      }, filename);
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Failed to generate PDF. Please try again.');
+      handleError(error, 'Failed to generate PDF. Please try again.');
     }
   };
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
+      
       {/* Header with Template Selection and Download Button */}
       <div className="border-b-2 border-gray-300 pb-4 mb-6">
         <div className="flex justify-between items-start mb-4">

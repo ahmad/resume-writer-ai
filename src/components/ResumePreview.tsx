@@ -1,16 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { saveResumeData } from "@/lib/firestore";
 import { ResumeData } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import type { ResumeTemplate } from "../html-pdf-generator";
 import TemplateSelector from "./resume/TemplateSelector";
+import { downloadPDF, generateResumeFilename } from "@/utils/pdf";
+import { LoadingOverlay } from "./common/LoadingOverlay";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { useResumeOperations } from "@/hooks/useResumeOperations";
 
 export default function ResumePreview({ data, isLoading }: { data: ResumeData; isLoading: boolean }) {
   const { user } = useAuth();
-  const [isSaving, setIsSaving] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<ResumeTemplate>('modern');
+  const { saveResume, isSaving } = useResumeOperations();
+  const { error, handleError, clearError } = useErrorHandler();
 
   if (Object.keys(data).length === 0) {
     return <div>No data</div>;
@@ -18,65 +22,40 @@ export default function ResumePreview({ data, isLoading }: { data: ResumeData; i
 
   const handleDownload = async () => {
     try {
-      // Create a blob URL for the PDF
-      const response = await fetch('/api/generate-pdf', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          type: 'resume', 
-          data,
-          template: selectedTemplate 
-        }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to generate PDF');
-      }
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${data.resumeName.replace(/\s+/g, '_') || data.name.replace(/\s+/g, '_')}_resume_${selectedTemplate}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      clearError();
+      const filename = generateResumeFilename(data.resumeName, data.name, selectedTemplate);
+      await downloadPDF({ 
+        type: 'resume', 
+        data,
+        template: selectedTemplate 
+      }, filename);
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('Failed to generate PDF. Please try again.');
+      handleError(error, 'Failed to generate PDF. Please try again.');
     }
   };
 
   const handleSave = async () => {
     if (!user) {
-      alert('Please log in to save your resume.');
+      handleError(new Error('Please log in to save your resume.'));
       return;
     }
 
-    setIsSaving(true);
     try {
-      await saveResumeData(user.uid, data);
+      clearError();
+      await saveResume(data);
       alert('Resume saved successfully!');
     } catch (error) {
-      console.error('Error saving resume:', error);
-      alert('Failed to save resume. Please try again.');
-    } finally {
-      setIsSaving(false);
+      // Error is already handled by the hook
     }
   };
 
   return (
     <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-4xl text-gray-900 text-sm relative">
-      {/* Loading Overlay */}
-      {isLoading && (
-        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-xl z-10">
-          <div className="flex flex-col items-center gap-3">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            <p className="text-gray-600 font-medium">Generating your resume...</p>
-          </div>
+      <LoadingOverlay isLoading={isLoading} text="Generating your resume..." />
+      
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
         </div>
       )}
       

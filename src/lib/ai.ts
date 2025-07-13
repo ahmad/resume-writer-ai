@@ -21,16 +21,15 @@ export function cleanAIResponse(text: string): string {
 }
 
 
-const key = process.env.GOOGLE_API_KEY;
-const model = process.env.GEMINI_MODEL;
+import { config } from '../config/environment';
 
-if (!key) {
+export const GEMINI_KEY: string = config.ai.model ? process.env.GOOGLE_API_KEY! : '';
+export const GEMINI_MODEL: string = config.ai.model;
+
+if (!GEMINI_KEY) {
     throw new Error('GOOGLE_API_KEY is not set');
 }
 
-if (!model) {
+if (!GEMINI_MODEL) {
     throw new Error('GEMINI_MODEL is not set');
 }
-
-export const GEMINI_KEY: string = key;
-export const GEMINI_MODEL: string = model;
