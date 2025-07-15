@@ -1,16 +1,16 @@
-import { CoverLetter, ResumeData } from "@/types";
+import { ResumeData } from "@/types";
 import { downloadPDF, generateCoverLetterFilename } from "@/utils/pdf";
 import { LoadingOverlay } from "./common/LoadingOverlay";
 import { Button } from "./common/Button";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 
-export default function CoverLetterPreview({ data, resumeData, isLoading }: { data: CoverLetter; resumeData: ResumeData; isLoading: boolean }) {
+export default function CoverLetterPreview({ data, resumeData, isLoading }: { data: string; resumeData: ResumeData; isLoading: boolean }) {
     const { error, handleError, clearError } = useErrorHandler();
 
     const handleDownload = async () => {
       try {
         clearError();
-        const filename = generateCoverLetterFilename(data.recipientName);
+        const filename = generateCoverLetterFilename(resumeData.name);
         await downloadPDF({ type: 'cover-letter', data }, filename);
       } catch (error) {
         handleError(error, 'Failed to generate PDF. Please try again.');
@@ -39,28 +39,11 @@ export default function CoverLetterPreview({ data, resumeData, isLoading }: { da
         </div>
   
                 <div className="space-y-4">
-            <div className="text-right text-sm text-gray-600">
-              {data.date}
-            </div>
-            
-            <div className="space-y-2">
-              <div className="font-semibold">{data.recipientName}</div>
-              <div>{data.recipientTitle}</div>
-              <div>{data.companyName}</div>
-            </div>
             
             <div className="mt-6 leading-relaxed whitespace-pre-wrap">
-              {data.content}
+              {data}
             </div>
             
-            <div className="mt-8 text-sm text-gray-600">
-              <div>Sincerely,</div>
-              <div className="mt-2">
-                <div>{resumeData.name}</div>
-                <div>{resumeData.email}</div>
-                <div>{resumeData.phone}</div>
-              </div>
-            </div>
           </div>
       </div>
     );

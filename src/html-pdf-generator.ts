@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer';
-import type { ResumeData, CoverLetter } from './types';
+import type { ResumeData } from './types';
 
 export type ResumeTemplate = 'modern' | 'ats-friendly';
 
@@ -550,10 +550,10 @@ export class HTMLPDFGenerator {
 }
 
 export class CoverLetterPDFGenerator {
-  private data: CoverLetter;
+  private data: string;
   private resumeData: ResumeData;
 
-  constructor(data: CoverLetter, resumeData: ResumeData) {
+  constructor(data: string, resumeData: ResumeData) {
     this.data = data;
     this.resumeData = resumeData;
   }
@@ -647,18 +647,8 @@ export class CoverLetterPDFGenerator {
             <div class="contact-info">${this.resumeData.email}</div>
             <div class="contact-info">${this.resumeData.phone}</div>
 
-
-            <div class="header-section">
-              <div class="date">${this.data.date}</div>
-            </div>
             
-            <div class="recipient-section">
-              <div class="recipient-name">${this.data.recipientName}</div>
-              <div class="recipient-title">${this.data.recipientTitle}</div>
-              <div class="company-name">${this.data.companyName}</div>
-            </div>
-            
-            <div class="content">${this.data.content}</div>
+            <div class="content">${this.data}</div>
             
             <div class="signature-section">
               <div>Sincerely,</div>

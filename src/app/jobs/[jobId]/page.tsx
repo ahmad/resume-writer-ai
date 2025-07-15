@@ -9,6 +9,7 @@ import { ResumeData } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
 import ResumePreview from "@/components/resume/ResumePreview";
 import ResumeForm from "@/components/resume/ResumeForm";
+import CoverLetterPreview from "@/components/CoverLetter";
 
 export default function GeneratePage({ params }: { params: Promise<{ jobId: string }>}) {
     const { jobId } = use(params);
@@ -20,6 +21,7 @@ export default function GeneratePage({ params }: { params: Promise<{ jobId: stri
     const [editedResume, setEditedResume] = useState<ResumeData | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
+    const [showCoverLetter, setShowCoverLetter] = useState(false);
 
     useEffect(() => {
         const fetchResume = async () => {
@@ -108,110 +110,103 @@ export default function GeneratePage({ params }: { params: Promise<{ jobId: stri
                 backButtonText="← Back to Builder"
                 pageTitle={job.selectedResume.resumeName}
             >
-                <div className="py-8">
-                    <div className="max-w-6xl mx-auto px-4">
-                        {/* Page Header */}
-                        <div className="mb-8">
-                            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                                Resume for Job Application
-                            </h1>
-                            <p className="text-gray-600 mb-4">
-                                {job.selectedResume.resumeName}
-                            </p>
-                            {job.jobUrl && (
-                                <div className="flex items-center gap-3">
-                                    <a
-                                        href={job.jobUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                    >
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                        </svg>
-                                        View Original Job Posting
-                                    </a>
-                                    <span className="text-sm text-gray-500">
-                                        Opens in new tab
-                                    </span>
-                                </div>
-                            )}
-                        </div>
+                <div className="max-w-4xl mx-auto px-4 py-8">
+                    {/* Simple Header */}
+                    <div className="mb-8">
+                        <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+                            {job.selectedResume.resumeName}
+                        </h1>
+                        {job.jobUrl && (
+                            <a
+                                href={job.jobUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-800 text-sm inline-flex items-center gap-1"
+                            >
+                                View job posting
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                            </a>
+                        )}
+                    </div>
 
-                    {/* Version Toggle */}
-                    {hasAiVersion && (
-                        <div className="mb-6">
-                            <div className="bg-white rounded-lg p-4 shadow-sm border">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                                            Resume Version
-                                        </h3>
-                                        <p className="text-sm text-gray-600">
-                                            Choose between your original resume and the AI-enhanced version
-                                        </p>
-                                    </div>
-                                    <div className="flex items-center space-x-4">
-                                        <button
-                                            onClick={() => setSelectedVersion('original')}
-                                            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                                                selectedVersion === 'original'
-                                                    ? 'bg-blue-500 text-white'
-                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                            }`}
-                                        >
-                                            Original
-                                        </button>
-                                        <button
-                                            onClick={() => setSelectedVersion('ai')}
-                                            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                                                selectedVersion === 'ai'
-                                                    ? 'bg-green-500 text-white'
-                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                            }`}
-                                        >
-                                            AI Enhanced
-                                        </button>
-                                        {selectedVersion === 'ai' && job.aiResume && (
-                                            <button
-                                                onClick={handleEditResume}
-                                                className="px-4 py-2 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors"
-                                            >
-                                                Edit AI Resume
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
+                    {/* Minimal Controls */}
+                    <div className="flex flex-wrap gap-3 mb-8">
+                        {hasAiVersion && (
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setSelectedVersion('original')}
+                                    className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                                        selectedVersion === 'original'
+                                            ? 'bg-gray-900 text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    Original
+                                </button>
+                                <button
+                                    onClick={() => setSelectedVersion('ai')}
+                                    className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                                        selectedVersion === 'ai'
+                                            ? 'bg-gray-900 text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                                >
+                                    AI Enhanced
+                                </button>
                             </div>
-                        </div>
-                    )}
+                        )}
+                        
+                        {selectedVersion === 'ai' && job.aiResume && (
+                            <button
+                                onClick={handleEditResume}
+                                className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                            >
+                                Edit
+                            </button>
+                        )}
+
+                        {job.aiCoverLetter && (
+                            <button
+                                onClick={() => setShowCoverLetter(!showCoverLetter)}
+                                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                                    showCoverLetter
+                                        ? 'bg-gray-900 text-white'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                            >
+                                {showCoverLetter ? 'Hide Cover Letter' : 'Cover Letter'}
+                            </button>
+                        )}
+                    </div>
 
                     {/* Resume Content */}
                     {isEditing && editedResume ? (
                         <div className="space-y-6">
                             <div className="flex justify-between items-center">
-                                <h2 className="text-xl font-semibold text-gray-900">
-                                    Edit AI Enhanced Resume
+                                <h2 className="text-lg font-medium text-gray-900">
+                                    Editing Resume
                                 </h2>
-                                <div className="flex space-x-3">
+                                <div className="flex gap-2">
                                     <button
                                         onClick={() => setShowPreview(!showPreview)}
-                                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                                        className="px-3 py-1.5 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
                                     >
-                                        {showPreview ? 'Hide Preview' : 'Show Preview'}
+                                        {showPreview ? 'Edit' : 'Preview'}
                                     </button>
                                     <button
                                         onClick={handleCancelEdit}
-                                        className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
+                                        className="px-3 py-1.5 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         onClick={handleSaveResume}
                                         disabled={isSaving}
-                                        className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                        className="px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                     >
-                                        {isSaving ? 'Saving...' : 'Save Changes'}
+                                        {isSaving ? 'Saving...' : 'Save'}
                                     </button>
                                 </div>
                             </div>
@@ -227,34 +222,39 @@ export default function GeneratePage({ params }: { params: Promise<{ jobId: stri
                     ) : currentResume ? (
                         <ResumePreview data={currentResume} isLoading={false} />
                     ) : (
-                        <div className="bg-white rounded-lg p-8 text-center shadow-sm border">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                {selectedVersion === 'ai' ? 'AI Enhanced Resume' : 'Original Resume'} Not Available
-                            </h3>
-                            <p className="text-gray-600">
+                        <div className="text-center py-12 text-gray-500">
+                            <p>
                                 {selectedVersion === 'ai' 
-                                    ? 'The AI-enhanced version of your resume is not yet available. Please check back later.'
-                                    : 'The original resume data is not available.'
+                                    ? 'AI Enhanced Resume not available'
+                                    : 'Original Resume not available'
                                 }
                             </p>
                         </div>
                     )}
 
-                    {/* Job Description (if available) */}
+                    {/* Cover Letter Content */}
+                    {showCoverLetter && job.aiCoverLetter && (
+                        <div className="mt-8">
+                            <CoverLetterPreview 
+                                data={job.aiCoverLetter} 
+                                resumeData={currentResume || job.selectedResume} 
+                                isLoading={false} 
+                            />
+                        </div>
+                    )}
+
+                    {/* Job Description */}
                     {job.jobDescription && (
-                        <div className="mt-8 bg-white rounded-lg p-6 shadow-sm border">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                        <div className="mt-8 p-6 bg-gray-50 rounded-lg">
+                            <h3 className="text-sm font-medium text-gray-900 mb-3 uppercase tracking-wide">
                                 Job Description
                             </h3>
-                            <div className="prose max-w-none">
-                                <p className="text-gray-700 whitespace-pre-wrap">
-                                    {job.jobDescription}
-                                </p>
+                            <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                                {job.jobDescription}
                             </div>
                         </div>
                     )}
                 </div>
-            </div>
             </AppLayout>
         </ProtectedRoute>
     )

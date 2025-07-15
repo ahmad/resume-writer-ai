@@ -21,14 +21,6 @@ export interface ResumeData {
 }
 
 
-export interface CoverLetter {
-  recipientName: string;
-  recipientTitle: string;
-  companyName: string;
-  content: string;
-  date: string;
-}
-
 export interface Experience {
   title: string;
   company: string;

@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { HTMLPDFGenerator, CoverLetterPDFGenerator } from '../../../html-pdf-generator';
-import type { ResumeData, CoverLetter } from '../../../types';
+import type { ResumeData } from '../../../types';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       buffer = await generator.generate();
       filename = `${resumeData.resumeName.replace(/\s+/g, '_') || resumeData.name.replace(/\s+/g, '_')}_resume_${template}.pdf`;
     } else if (type === 'cover-letter') {
-      const coverLetterData = data as CoverLetter;
+      const coverLetterData = data as string;
       // For cover letter, we need resume data for the signature
       // This is a simplified approach - in a real app you might want to pass resume data separately
       const generator = new CoverLetterPDFGenerator(coverLetterData, {
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
         projects: []
       });
       buffer = await generator.generate();
-      filename = `${coverLetterData.recipientName.replace(/\s+/g, '_')}_cover_letter.pdf`;
+      filename = `ahmad_amin_cover_letter.pdf`;
     } else {
       throw new Error('Invalid type specified. Must be "resume" or "cover-letter"');
     }

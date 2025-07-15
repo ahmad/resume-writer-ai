@@ -20,6 +20,7 @@ export interface JobData {
   userId: string;
   jobDescription: string;
   aiResume?: ResumeData;
+  aiCoverLetter?: string;
   selectedResume: ResumeData;
   jobUrl?: string;
   status: 'pending' | 'processing' | 'completed' | 'failed';
