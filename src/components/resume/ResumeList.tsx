@@ -245,41 +245,51 @@ export default function ResumeList({
             <p className="text-sm text-gray-600">Resumes tailored for specific job applications</p>
           </div>
           
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {aiJobs.map((job) => (
-              <Link
-                key={job.id}
-                href={`/jobs/${job.id}`}
-                className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors block"
-              >
-                <div className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-base font-medium text-gray-900 truncate">
-                      {job.selectedResume.resumeName || 'Untitled Resume'}
-                    </h3>
-                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status || 'pending')}`}>
-                      {getStatusIcon(job.status || 'pending')}
-                      {job.status || 'pending'}
-                    </span>
-                  </div>
-                  
-                  <p className="text-sm text-gray-600 mb-2">
-                    {job.selectedResume.title || 'No title specified'}
-                  </p>
-                  
-                  {job.jobDescription && (
-                    <p className="text-xs text-gray-500 line-clamp-2">
-                      {job.jobDescription.substring(0, 100)}...
+          {isLoadingJobs ? (
+            <div className="flex justify-center items-center py-12">
+              <svg className="animate-spin h-8 w-8 text-blue-600 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              </svg>
+              <span className="text-blue-600 text-lg">Loading AI jobs...</span>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {aiJobs.map((job) => (
+                <Link
+                  key={job.id}
+                  href={`/jobs/${job.id}`}
+                  className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors block"
+                >
+                  <div className="p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-base font-medium text-gray-900 truncate">
+                        {job.selectedResume.resumeName || 'Untitled Resume'}
+                      </h3>
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status || 'pending')}`}> 
+                        {getStatusIcon(job.status || 'pending')}
+                        {job.status || 'pending'}
+                      </span>
+                    </div>
+                    
+                    <p className="text-sm text-gray-600 mb-2">
+                      {job.selectedResume.title || 'No title specified'}
                     </p>
-                  )}
-                  
-                  <p className="text-xs text-gray-500 mt-2">
-                    Created: {formatDate(job.createdAt)}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
+                    
+                    {job.jobDescription && (
+                      <p className="text-xs text-gray-500 line-clamp-2">
+                        {job.jobDescription.substring(0, 100)}...
+                      </p>
+                    )}
+                    
+                    <p className="text-xs text-gray-500 mt-2">
+                      Created: {formatDate(job.createdAt)}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
