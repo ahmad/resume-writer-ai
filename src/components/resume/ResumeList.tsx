@@ -109,64 +109,62 @@ export default function ResumeList({
   };
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8">
       {/* Regular Resumes Section */}
       <div className="space-y-6">
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">My Resumes</h2>
-            <p className="text-gray-600 mt-1">Manage and edit your professional resumes</p>
+            <h2 className="text-lg font-medium text-gray-900">My Resumes</h2>
+            <p className="text-sm text-gray-600 mt-1">Manage and edit your professional resumes</p>
           </div>
           <div className="flex gap-2">
-
-          <button
-            onClick={onGenerateAIResume}
-            className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-          >
-            Generate AI Resume
-          </button>
-
-          <button
-            onClick={onCreateNew}
-            className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Create New Resume
-          </button>
+            <button
+              onClick={onGenerateAIResume}
+              className="px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+            >
+              Generate AI Resume
+            </button>
+            <button
+              onClick={onCreateNew}
+              className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Create New
+            </button>
           </div>
         </div>
 
         {/* Resume List */}
         {resumes.length === 0 ? (
           <div className="text-center py-12">
-            <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No resumes yet</h3>
-            <p className="text-gray-600 mb-6">Create your first professional resume to get started</p>
+            <h3 className="text-base font-medium text-gray-900 mb-2">No resumes yet</h3>
+            <p className="text-sm text-gray-600 mb-4">Create your first professional resume to get started</p>
             <button
               onClick={onCreateNew}
-              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
             >
               Create Your First Resume
             </button>
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {resumes.map((resume) => (
               <div
                 key={resume.id}
-                className="bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow"
+                className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
               >
                 {/* Resume Header */}
-                <div className="p-6 border-b border-gray-200">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-semibold text-gray-900 truncate">
+                <div className="p-4 border-b border-gray-100">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-base font-medium text-gray-900 truncate">
                       {resume.resumeName || 'Untitled Resume'}
                     </h3>
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-1">
                       <button
                         onClick={() => onEditResume(resume.id)}
                         className="text-blue-600 hover:text-blue-800 p-1"
@@ -196,83 +194,41 @@ export default function ResumeList({
                       </button>
                     </div>
                   </div>
-                  <p className="text-gray-600 text-sm mb-2">
+                  <p className="text-sm text-gray-600 mb-2">
                     {resume.title || 'No title specified'}
                   </p>
-                  <p className="text-gray-500 text-xs">
+                  <p className="text-xs text-gray-500">
                     Last updated: {formatDate(resume.updatedAt)}
                   </p>
                 </div>
 
-                {/* Resume Preview */}
-                <div className="p-6">
-                  <div className="space-y-3">
-                    {/* Contact Info Preview */}
-                    <div className="text-sm">
-                      <div className="text-gray-600 mb-1">Contact</div>
-                      <div className="space-y-1">
-                        {resume.email && (
-                          <div className="text-gray-800 truncate">{resume.email}</div>
-                        )}
-                        {resume.phone && (
-                          <div className="text-gray-800 truncate">{resume.phone}</div>
-                        )}
-                        {resume.location && (
-                          <div className="text-gray-800 truncate">{resume.location}</div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Experience Preview */}
-                    {resume.experience.length > 0 && (
-                      <div className="text-sm">
-                        <div className="text-gray-600 mb-1">Experience</div>
-                        <div className="space-y-1">
-                          {resume.experience.slice(0, 2).map((exp, index) => (
-                            <div key={index} className="text-gray-800 truncate">
-                              {exp.title} at {exp.company}
-                            </div>
-                          ))}
-                          {resume.experience.length > 2 && (
-                            <div className="text-gray-500 text-xs">
-                              +{resume.experience.length - 2} more positions
-                            </div>
-                          )}
-                        </div>
+                {/* Resume Content Preview */}
+                <div className="p-4">
+                  <div className="space-y-2">
+                    {resume.name && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">Name:</span>
+                        <span className="text-sm text-gray-900">{resume.name}</span>
                       </div>
                     )}
-
-                    {/* Skills Preview */}
-                    {Object.keys(resume.skills).length > 0 && (
-                      <div className="text-sm">
-                        <div className="text-gray-600 mb-1">Skills</div>
-                        <div className="flex flex-wrap gap-1">
-                          {Object.entries(resume.skills).slice(0, 3).map(([category, skills]) =>
-                            skills.slice(0, 2).map((skill, index) => (
-                              <span
-                                key={`${category}-${index}`}
-                                className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs"
-                              >
-                                {skill}
-                              </span>
-                            ))
-                          )}
-                          {Object.values(resume.skills).flat().length > 6 && (
-                            <span className="text-gray-500 text-xs">+more</span>
-                          )}
-                        </div>
+                    {resume.email && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">Email:</span>
+                        <span className="text-sm text-gray-900">{resume.email}</span>
                       </div>
                     )}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="mt-6 pt-4 border-t border-gray-200">
-                    <button
-                      onClick={() => onEditResume(resume.id)}
-                      className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
-                    >
-                      Edit Resume
-                    </button>
+                    {resume.experience && resume.experience.length > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">Experience:</span>
+                        <span className="text-sm text-gray-900">{resume.experience.length} position{resume.experience.length !== 1 ? 's' : ''}</span>
+                      </div>
+                    )}
+                    {resume.education && resume.education.length > 0 && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">Education:</span>
+                        <span className="text-sm text-gray-900">{resume.education.length} degree{resume.education.length !== 1 ? 's' : ''}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -282,130 +238,50 @@ export default function ResumeList({
       </div>
 
       {/* AI Jobs Section */}
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
+      {aiJobs.length > 0 && (
+        <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">AI Jobs</h2>
-            <p className="text-gray-600 mt-1">Track your AI-generated resume requests</p>
+            <h2 className="text-lg font-medium text-gray-900 mb-2">AI-Generated Resumes</h2>
+            <p className="text-sm text-gray-600">Resumes tailored for specific job applications</p>
           </div>
-          <button
-            onClick={loadAIJobs}
-            disabled={isLoadingJobs}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors disabled:opacity-50"
-          >
-            {isLoadingJobs ? (
-              <div className="flex items-center gap-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
-                <span>Loading...</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                <span>Refresh</span>
-              </div>
-            )}
-          </button>
-        </div>
-
-        {/* AI Jobs List */}
-        {aiJobs.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No AI jobs yet</h3>
-            <p className="text-gray-600 mb-6">Generate your first AI-tailored resume to see it here</p>
-            <button
-              onClick={onGenerateAIResume}
-              className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-            >
-              Generate AI Resume
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-2">
+          
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {aiJobs.map((job) => (
-              <div
+              <Link
                 key={job.id}
-                className="bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow"
+                href={`/jobs/${job.id}`}
+                className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors block"
               >
                 <div className="p-4">
                   <div className="flex justify-between items-start mb-2">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-base font-semibold text-gray-900">
-                          {job.selectedResume.resumeName || 'Untitled Resume'}
-                        </h3>
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
-                          {getStatusIcon(job.status)}
-                          {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-4 text-xs text-gray-600 mb-2">
-                        <span>Created: {formatDate(job.createdAt)}</span>
-                      </div>
-                    </div>
+                    <h3 className="text-base font-medium text-gray-900 truncate">
+                      {job.selectedResume.resumeName || 'Untitled Resume'}
+                    </h3>
+                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status || 'pending')}`}>
+                      {getStatusIcon(job.status || 'pending')}
+                      {job.status || 'pending'}
+                    </span>
                   </div>
-
-                  {/* Job Description Preview */}
-                  <div className="mb-2">
-                    <div className="bg-gray-50 rounded-md p-2">
-                      <p className="text-xs text-gray-800 line-clamp-2">
-                        {job.jobDescription.length > 150 
-                          ? `${job.jobDescription.substring(0, 150)}...` 
-                          : job.jobDescription
-                        }
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Status-specific actions */}
-                  <div className="flex justify-between items-center pt-2 border-t border-gray-200">
-                    <div className="text-xs text-gray-500">
-                      Updated: {formatDate(job.updatedAt)}
-                    </div>
-                    <div className="flex gap-2">
-                      {job.jobUrl && (
-                        <a
-                          href={job.jobUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition-colors inline-flex items-center gap-1"
-                        >
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                          </svg>
-                          View Job
-                        </a>
-                      )}
-                      {job.status === 'completed' && (
-                        <Link href={`/jobs/${job.id}`} className="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700 transition-colors">
-                          View Result
-                        </Link>
-                      )}
-                      {job.status === 'failed' && (
-                        <button className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700 transition-colors">
-                          Retry
-                        </button>
-                      )}
-                      {(job.status === 'pending' || job.status === 'processing') && (
-                        <div className="text-xs text-gray-500">
-                          Processing...
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  
+                  <p className="text-sm text-gray-600 mb-2">
+                    {job.selectedResume.title || 'No title specified'}
+                  </p>
+                  
+                  {job.jobDescription && (
+                    <p className="text-xs text-gray-500 line-clamp-2">
+                      {job.jobDescription.substring(0, 100)}...
+                    </p>
+                  )}
+                  
+                  <p className="text-xs text-gray-500 mt-2">
+                    Created: {formatDate(job.createdAt)}
+                  </p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 } 

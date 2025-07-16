@@ -14,18 +14,18 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onSuccess, initialMode = 'lo
   const isLogin = initialMode === 'login';
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8 px-4">
+      <div className="max-w-sm w-full space-y-6">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="text-xl font-semibold text-gray-900 text-center">
             {isLogin ? 'Sign in to your account' : 'Create your account'}
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            {isLogin ? 'Welcome back to Resume Writer AI' : 'Join Resume Writer AI to get started'}
+          <p className="text-sm text-gray-600 text-center mt-2">
+            {isLogin ? 'Welcome back to ResumeOracle' : 'Join ResumeOracle to get started'}
           </p>
         </div>
 
-        <div className="bg-white py-8 px-6 shadow rounded-lg">
+        <div className="bg-white py-6 px-4 rounded-lg border border-gray-200">
           {initialMode ? (
             <LoginForm
               onSuccess={onSuccess}

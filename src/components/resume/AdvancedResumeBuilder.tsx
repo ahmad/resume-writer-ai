@@ -11,7 +11,6 @@ import AIResumeGenerator from './AIResumeGenerator';
 import { useResumeOperations } from '@/hooks/useResumeOperations';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { Button } from '@/components/common/Button';
 import { useUIState } from '@/contexts/UIStateContext';
 
 
@@ -199,7 +198,7 @@ export default function AdvancedResumeBuilder() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Please log in to access the resume builder</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Please log in to access the resume builder</h2>
           <p className="text-gray-600">You need to be authenticated to create and manage your resumes.</p>
         </div>
       </div>
@@ -207,107 +206,113 @@ export default function AdvancedResumeBuilder() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <h1 className="text-2xl font-bold text-gray-900">Advanced Resume Builder</h1>
-            <div className="flex space-x-3">
-              <Button
-                variant={viewMode === 'list' ? 'primary' : 'secondary'}
-                onClick={() => setViewMode('list')}
-                size="sm"
-              >
-                My Resumes
-              </Button>
-              <Button
-                variant={viewMode === 'form' ? 'primary' : 'secondary'}
-                onClick={() => setViewMode('form')}
-                size="sm"
-              >
-                Editor
-              </Button>
-              <Button
-                variant={viewMode === 'preview' ? 'primary' : 'secondary'}
-                onClick={() => setViewMode('preview')}
-                size="sm"
-              >
-                Preview
-              </Button>
-            </div>
-          </div>
+    <div className="max-w-4xl mx-auto px-4 py-8">
+      {/* Simple Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+          Resume Builder
+        </h1>
+        <p className="text-sm text-gray-600">
+          Create and manage your professional resumes
+        </p>
+      </div>
+
+      {/* Minimal Controls */}
+      <div className="flex flex-wrap gap-3 mb-8">
+        <button
+          onClick={() => setViewMode('list')}
+          className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+            viewMode === 'list'
+              ? 'bg-gray-900 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          My Resumes
+        </button>
+        <button
+          onClick={() => setViewMode('form')}
+          className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+            viewMode === 'form'
+              ? 'bg-gray-900 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          Editor
+        </button>
+        <button
+          onClick={() => setViewMode('preview')}
+          className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+            viewMode === 'preview'
+              ? 'bg-gray-900 text-white'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+          }`}
+        >
+          Preview
+        </button>
+      </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="mb-6 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+          {error}
         </div>
-      </div>
-
+      )}
+      
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error}
-          </div>
-        )}
-        
-        {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <LoadingSpinner size="lg" />
-          </div>
-        ) : (
-          <>
-            {viewMode === 'list' && (
-              <ResumeList
-                resumes={userResumes}
-                onGenerateAIResume={handleGenerateAIResume}
-                onCreateNew={handleCreateNew}
-                onEditResume={handleEditResume}
-                onDeleteResume={handleDeleteResume}
-                onDuplicateResume={handleDuplicateResume}
+      {isLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <LoadingSpinner size="lg" />
+        </div>
+      ) : (
+        <>
+          {viewMode === 'list' && (
+            <ResumeList
+              resumes={userResumes}
+              onGenerateAIResume={handleGenerateAIResume}
+              onCreateNew={handleCreateNew}
+              onEditResume={handleEditResume}
+              onDeleteResume={handleDeleteResume}
+              onDuplicateResume={handleDuplicateResume}
+            />
+          )}
+
+          {viewMode === 'form' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-lg font-medium text-gray-900">
+                  {currentResumeId ? 'Edit Resume' : 'Create New Resume'}
+                </h2>
+                <button
+                  onClick={handleSaveResume}
+                  disabled={isSaving}
+                  className="px-3 py-1.5 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {isSaving ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+              <ResumeForm
+                data={resumeData}
+                onChange={handleDataChange}
               />
-            )}
+            </div>
+          )}
 
-            {viewMode === 'form' && (
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    {currentResumeId ? 'Edit Resume' : 'Create New Resume'}
-                  </h2>
-                  <div className="flex space-x-3">
-                    <Button
-                      variant="success"
-                      onClick={handleSaveResume}
-                      disabled={isSaving}
-                      loading={isSaving}
-                      loadingText="Saving..."
-                    >
-                      Save Resume
-                    </Button>
-                  </div>
-                </div>
-                <ResumeForm
-                  data={resumeData}
-                  onChange={handleDataChange}
-                />
+          {viewMode === 'preview' && (
+            <div className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-lg font-medium text-gray-900">Resume Preview</h2>
+                <button
+                  onClick={() => setViewMode('form')}
+                  className="px-3 py-1.5 text-sm bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                >
+                  Back to Editor
+                </button>
               </div>
-            )}
-
-            {viewMode === 'preview' && (
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-semibold text-gray-900">Resume Preview</h2>
-                  <Button
-                    variant="primary"
-                    onClick={() => setViewMode('form')}
-                    size="sm"
-                  >
-                    Back to Editor
-                  </Button>
-                </div>
-                <ResumePreview data={resumeData} isLoading={isLoading} />
-              </div>
-            )}
-          </>
-        )}
-      </div>
+              <ResumePreview data={resumeData} isLoading={isLoading} />
+            </div>
+          )}
+        </>
+      )}
 
       {/* AI Resume Generator Popover */}
       <AIResumeGenerator
