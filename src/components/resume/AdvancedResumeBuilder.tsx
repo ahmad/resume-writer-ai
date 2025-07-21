@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ResumeData } from '../../types';
-import { saveJobData } from '../../lib/firestore';
+import { saveJobData, setDefaultResume } from '../../lib/firestore';
 import ResumeForm from './ResumeForm';
 import ResumePreview from './ResumePreview';
 import ResumeList from './ResumeList';
@@ -165,6 +165,26 @@ export default function AdvancedResumeBuilder() {
     }
   };
 
+  const handleSetDefaultResume = async (resumeId: string) => {
+    if (!user) return;
+    try {
+      await setDefaultResume(user.uid, resumeId);
+      await loadUserResumesData();
+      showNotification({
+        type: 'success',
+        title: 'Default Resume Updated',
+        message: 'Your default resume has been updated.'
+      });
+    } catch (error) {
+      console.error('Error setting default resume:', error);
+      showNotification({
+        type: 'error',
+        title: 'Error',
+        message: 'Failed to set default resume. Please try again.'
+      });
+    }
+  };
+
   const handleDataChange = (newData: Partial<ResumeData>) => {
     setResumeData(prev => ({ ...prev, ...newData }));
   };
@@ -273,6 +293,7 @@ export default function AdvancedResumeBuilder() {
               onEditResume={handleEditResume}
               onDeleteResume={handleDeleteResume}
               onDuplicateResume={handleDuplicateResume}
+              onSetDefaultResume={handleSetDefaultResume}
             />
           )}
 

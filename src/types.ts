@@ -18,6 +18,7 @@ export interface ResumeData {
   projects: Project[];
   generated?: boolean;
   template?: 'modern' | 'ats-friendly';
+  isDefault?: boolean; // Indicates if this is the default resume
 }
 
 

@@ -283,3 +283,21 @@ export const getResume = async (resumeId: string): Promise<LegacyResumeData | nu
   }
   return null;
 }; 
+
+/**
+ * Set a user's default resume by updating isDefault for all their resumes.
+ */
+export const setDefaultResume = async (userId: string, resumeId: string): Promise<void> => {
+  const resumesRef = collection(db, 'resumes');
+  const q = query(resumesRef, where('userId', '==', userId));
+  const querySnapshot = await getDocs(q);
+
+  const batch = (await import('firebase/firestore')).writeBatch(db);
+
+  querySnapshot.forEach((docSnap) => {
+    const isDefault = docSnap.id === resumeId;
+    batch.update(doc(resumesRef, docSnap.id), { isDefault });
+  });
+
+  await batch.commit();
+}; 

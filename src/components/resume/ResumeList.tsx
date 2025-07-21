@@ -13,6 +13,7 @@ interface ResumeListProps {
   onDeleteResume: (resumeId: string) => void;
   onDuplicateResume: (resumeId: string) => void;
   onGenerateAIResume: () => void;
+  onSetDefaultResume: (resumeId: string) => void;
 }
 
 export default function ResumeList({ 
@@ -21,7 +22,8 @@ export default function ResumeList({
   onEditResume, 
   onDeleteResume,
   onDuplicateResume,
-  onGenerateAIResume
+  onGenerateAIResume,
+  onSetDefaultResume
 }: ResumeListProps) {
   const { user } = useAuth();
   const [aiJobs, setAiJobs] = useState<Array<JobData & { id: string }>>([]);
@@ -156,52 +158,62 @@ export default function ResumeList({
             {resumes.map((resume) => (
               <div
                 key={resume.id}
-                className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+                className={`bg-white rounded-lg border transition-colors ${resume.isDefault ? 'border-yellow-400 shadow-lg' : 'border-gray-200 hover:border-gray-300'}`}
               >
                 {/* Resume Header */}
-                <div className="p-4 border-b border-gray-100">
-                  <div className="flex justify-between items-start mb-2">
+                <div className="p-4 border-b border-gray-100 flex justify-between items-start">
+                  <div>
                     <h3 className="text-base font-medium text-gray-900 truncate">
                       {resume.resumeName || 'Untitled Resume'}
                     </h3>
-                    <div className="flex space-x-1">
-                      <button
-                        onClick={() => onEditResume(resume.id)}
-                        className="text-blue-600 hover:text-blue-800 p-1"
-                        title="Edit Resume"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => onDuplicateResume(resume.id)}
-                        className="text-green-600 hover:text-green-800 p-1"
-                        title="Duplicate Resume"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => onDeleteResume(resume.id)}
-                        className="text-red-600 hover:text-red-800 p-1"
-                        title="Delete Resume"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {resume.title || 'No title specified'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Last updated: {formatDate(resume.updatedAt)}
+                    </p>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">
-                    {resume.title || 'No title specified'}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Last updated: {formatDate(resume.updatedAt)}
-                  </p>
+                  <div className="flex flex-col items-end gap-2">
+                    {/* Default Resume Selector */}
+                    <button
+                      title={resume.isDefault ? 'Default Resume' : 'Set as Default'}
+                      onClick={() => onSetDefaultResume(resume.id)}
+                      className={`focus:outline-none ${resume.isDefault ? 'text-yellow-500' : 'text-gray-400 hover:text-yellow-500'}`}
+                      aria-label={resume.isDefault ? 'Default Resume' : 'Set as Default'}
+                    >
+                      <svg className="w-6 h-6" fill={resume.isDefault ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 17.75l-6.172 3.245 1.179-6.873-5-4.873 6.9-1.002L12 2.5l3.093 6.747 6.9 1.002-5 4.873 1.179 6.873z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => onEditResume(resume.id)}
+                      className="text-blue-600 hover:text-blue-800 p-1"
+                      title="Edit Resume"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => onDuplicateResume(resume.id)}
+                      className="text-green-600 hover:text-green-800 p-1"
+                      title="Duplicate Resume"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => onDeleteResume(resume.id)}
+                      className="text-red-600 hover:text-red-800 p-1"
+                      title="Delete Resume"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
-
                 {/* Resume Content Preview */}
                 <div className="p-4">
                   <div className="space-y-2">
