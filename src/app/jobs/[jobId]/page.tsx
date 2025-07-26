@@ -1,6 +1,6 @@
 'use client';
 
-import { getUserGeneratedResumes, JobData, updateAIResume } from "@/lib/firestore";
+import { getUserGeneratedResumes, JobData, updateAIResume, requeueJob } from "@/lib/firestore";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { use, useEffect, useState } from "react";
@@ -22,6 +22,7 @@ export default function GeneratePage({ params }: { params: Promise<{ jobId: stri
     const [isSaving, setIsSaving] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [showCoverLetter, setShowCoverLetter] = useState(false);
+    const [isReprocessing, setIsReprocessing] = useState(false);
 
     useEffect(() => {
         const fetchResume = async () => {
@@ -101,6 +102,21 @@ export default function GeneratePage({ params }: { params: Promise<{ jobId: stri
             setEditedResume(prev => prev ? { ...prev, ...newData } : null);
         }
     };
+
+    const handleReprocess = async () => {
+        if (!user || !jobId) return;
+        setIsReprocessing(true);
+        try {
+            await requeueJob(user.uid, jobId);
+            setJob(prev => prev ? { ...prev, status: 'pending' } : prev);
+            alert('Job re-queued for processing!');
+        } catch (error) {
+            console.error('Error re-queuing job:', error);
+            alert('Failed to re-queue job. Please try again.');
+        } finally {
+            setIsReprocessing(false);
+        }
+    };
             
     return (
         <ProtectedRoute>
@@ -156,6 +172,16 @@ export default function GeneratePage({ params }: { params: Promise<{ jobId: stri
                                     AI Enhanced
                                 </button>
                             </div>
+                        )}
+                        {/* Reprocess Button: show if job is not pending or processing */}
+                        {job.status !== 'pending' && job.status !== 'processing' && (
+                            <button
+                                onClick={handleReprocess}
+                                disabled={isReprocessing}
+                                className="px-3 py-1.5 text-sm bg-yellow-600 text-white rounded-md hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                {isReprocessing ? 'Reprocessing...' : 'Reprocess'}
+                            </button>
                         )}
                         
                         {selectedVersion === 'ai' && job.aiResume && (

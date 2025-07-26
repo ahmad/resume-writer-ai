@@ -357,24 +357,18 @@ export class HTMLPDFGenerator {
             }
             
             .skill-category-name {
-              width: 25%;
               font-weight: 600;
               font-size: 12px;
             }
             
             .skill-tags {
-              width: 75%;
               display: flex;
               flex-wrap: wrap;
               gap: 4px;
             }
             
             .skill-tag {
-              background-color: #dbeafe;
-              color: #1e40af;
-              padding: 2px 8px;
-              border-radius: 4px;
-              font-size: 11px;
+              font-size: 12px;
               font-weight: 500;
             }
             
@@ -481,9 +475,9 @@ export class HTMLPDFGenerator {
               <div class="skills-grid">
                 ${Object.keys(this.data.skills).map(key => `
                   <div class="skill-category">
-                    <div class="skill-category-name">${key}</div>
+                    <div class="skill-category-name">${key}: </div>
                     <div class="skill-tags">
-                      ${this.data.skills[key].map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                      ${this.data.skills[key].map(skill => `${skill}`).join(', ')}
                     </div>
                   </div>
                 `).join('')}

@@ -301,3 +301,54 @@ export const setDefaultResume = async (userId: string, resumeId: string): Promis
 
   await batch.commit();
 }; 
+
+// Get the user's default resume
+export const getDefaultResume = async (userId: string): Promise<(ResumeData & { id: string }) | null> => {
+  const resumesRef = collection(db, 'resumes');
+  const q = query(
+    resumesRef,
+    where('userId', '==', userId),
+    where('isDefault', '==', true)
+  );
+
+  const querySnapshot = await getDocs(q);
+  if (querySnapshot.empty) {
+    return null;
+  }
+
+  const doc = querySnapshot.docs[0];
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { userId: _userId, createdAt, updatedAt, ...resumeData } = doc.data();
+  return { id: doc.id, ...resumeData } as ResumeData & { id: string };
+}; 
+
+// Re-queue a job for processing
+export const requeueJob = async (userId: string, jobId: string): Promise<void> => {
+  const jobRef = doc(db, 'users', userId, 'jobs', jobId);
+  const jobDoc = await getDoc(jobRef);
+  if (!jobDoc.exists()) {
+    throw new Error('Job not found');
+  }
+  const jobData = jobDoc.data();
+  if (!jobData) {
+    throw new Error('Job data is empty');
+  }
+  // Update job status to 'pending'
+  await updateDoc(jobRef, {
+    status: 'pending',
+    updatedAt: Timestamp.now(),
+  });
+  // Add to global jobQueue
+  const queueRef = collection(db, 'jobQueue');
+  const queueJobRef = doc(queueRef);
+  const now = Timestamp.now();
+  const queueJobData = {
+    ...jobData,
+    status: 'pending',
+    jobDocumentId: jobId,
+    queueId: queueJobRef.id,
+    createdAt: now,
+    updatedAt: now,
+  };
+  await setDoc(queueJobRef, queueJobData);
+}; 

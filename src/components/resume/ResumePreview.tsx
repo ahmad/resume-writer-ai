@@ -150,7 +150,7 @@ export default function ResumePreview({ data }: ResumePreviewProps) {
       )}
 
       {/* Projects */}
-      {data.projects.length > 0 && (
+{/*       {data.projects.length > 0 && (
         <div className="mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-3">Projects</h2>
           <div className="space-y-4">
@@ -174,7 +174,7 @@ export default function ResumePreview({ data }: ResumePreviewProps) {
             ))}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Education */}
       {data.education.length > 0 && (
